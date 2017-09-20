@@ -17,7 +17,7 @@ type Podcast struct {
 type Episode struct {
 	Episode   int32
 	Created   string
-	Location  string
+	URL       string
 	Downloads int32
 	Details   string
 }
