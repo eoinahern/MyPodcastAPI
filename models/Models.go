@@ -6,6 +6,10 @@ type User struct {
 	Podcasts []Podcast
 }
 
+type Message struct {
+	Message string `json: "Message"`
+}
+
 type Podcast struct {
 	Username string
 	Icon     string

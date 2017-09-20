@@ -1,11 +1,16 @@
 package main
 
-
-import ( "net/http"
-"my_podcast_api/routes")
+import (
+	"my_podcast_api/routes"
+	"my_podcast_api/validation"
+	"net/http"
+)
 
 func main() {
-  http.Handle("/register", &routes.RegisterHandler{})
-  http.Handle("/createsession", &routes.CreateSessionHandler{})
-  http.ListenAndServe(":8080", nil)
+
+	emailValidator := &validation.EmailValidation{}
+
+	http.Handle("/register", &routes.RegisterHandler{EmailValidator: emailValidator})
+	http.Handle("/createsession", &routes.CreateSessionHandler{})
+	http.ListenAndServe(":8080", nil)
 }

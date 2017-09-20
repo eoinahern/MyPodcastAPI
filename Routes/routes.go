@@ -1,12 +1,15 @@
 package routes
 
 import (
-	"fmt"
+	"encoding/json"
 	"io"
+	"my_podcast_api/models"
+	"my_podcast_api/validation"
 	"net/http"
 )
 
 type RegisterHandler struct {
+	EmailValidator *validation.EmailValidation
 }
 
 type CreateSessionHandler struct {
@@ -38,12 +41,28 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	//4. return json with error message
 
-	if req.Method == http.MethodPost {
-		fmt.Println("user is registered weeee!")
-		return
-	} else {
+	if req.Method != http.MethodPost {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
 	}
+
+	username := req.FormValue("UserName")
+	password := req.FormValue("Password")
+
+	if len(username) == 0 || len(password) == 0 {
+		http.Error(w, "incorrect params", http.StatusBadRequest)
+		return
+	}
+
+	if isValidEmail := r.EmailValidator.CheckEmailValid(username); !isValidEmail {
+		http.Error(w, "invalid email", http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	resp, _ := json.Marshal(models.Message{"it worked!!!"})
+	w.Write(resp)
+
 }
 
 func (c *CreateSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
