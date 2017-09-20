@@ -4,8 +4,6 @@ import ( "net/http"
  "io"
 "fmt")
 
-
-
 type RegisterHandler struct {
 }
 
