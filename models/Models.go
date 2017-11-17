@@ -3,7 +3,7 @@ package models
 type User struct {
 	UserName string `json: "username"`
 	Verified bool   `json: "verified"`
-	Password []byte `json: "password"`
+	Password string `json: "password"`
 }
 
 type Session struct {

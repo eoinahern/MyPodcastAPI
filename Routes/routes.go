@@ -47,31 +47,40 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	username := req.FormValue("UserName")
-	password := req.FormValue("Password")
+	decoder := json.NewDecoder(req.Body)
 
-	if len(username) == 0 || len(password) == 0 {
+	var user models.User
+	err := decoder.Decode(&user)
+
+	if err != nil {
+		panic(err)
+	}
+
+	//username := req.Body("UserName")
+	//password := req.Body("Password")
+
+	if len(user.UserName) == 0 || len(user.Password) == 0 {
 		http.Error(w, "incorrect params", http.StatusBadRequest)
 		return
 	}
 
-	if isValidEmail := r.EmailValidator.CheckEmailValid(username); !isValidEmail {
+	if isValidEmail := r.EmailValidator.CheckEmailValid(user.UserName); !isValidEmail {
 		http.Error(w, "invalid email", http.StatusBadRequest)
 		return
 	}
 
 	//check user is in the DB?
 
-	if r.DB.CheckExist(username) {
+	if r.DB.CheckExist(user.UserName) {
 		http.Error(w, "user already exists!!", http.StatusConflict)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	resp, _ := json.Marshal(models.User{
-		UserName: username,
+		UserName: user.UserName,
 		Verified: false,
-		Password: []byte("boo"),
+		Password: user.Password,
 	})
 	w.Write(resp)
 }
