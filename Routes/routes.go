@@ -18,6 +18,9 @@ type RegisterHandler struct {
 type CreateSessionHandler struct {
 }
 
+type ReCreateSession struct {
+}
+
 type EndSessionHandler struct {
 }
 
@@ -56,9 +59,6 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	//username := req.Body("UserName")
-	//password := req.Body("Password")
-
 	if len(user.UserName) == 0 || len(user.Password) == 0 {
 		http.Error(w, "incorrect params", http.StatusBadRequest)
 		return
@@ -76,12 +76,11 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	//encrypt password!! and then insert!!
+	r.DB.Insert(user)
+
 	w.Header().Set("Content-Type", "application/json")
-	resp, _ := json.Marshal(models.User{
-		UserName: user.UserName,
-		Verified: false,
-		Password: user.Password,
-	})
+	resp, _ := json.Marshal(user)
 	w.Write(resp)
 }
 

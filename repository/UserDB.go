@@ -9,6 +9,12 @@ func (DB *UserDB) CheckExist(email string) bool {
 	return false
 }
 
+func (DB *UserDB) Insert(user *models.User) {
+
+	//inset a row into the database table for users
+
+}
+
 func (DB *UserDB) GetItem(email string) *models.User {
 
 	return &models.User{}
