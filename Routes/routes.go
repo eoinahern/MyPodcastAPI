@@ -4,12 +4,15 @@ import (
 	"encoding/json"
 	"io"
 	"my_podcast_api/models"
+	"my_podcast_api/repository"
 	"my_podcast_api/validation"
 	"net/http"
 )
 
+//tregister user!!!
 type RegisterHandler struct {
 	EmailValidator *validation.EmailValidation
+	DB             *repository.UserDB
 }
 
 type CreateSessionHandler struct {
@@ -34,12 +37,10 @@ type DeleteEpisodeHandler struct {
 }
 
 func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-
+	// this is overly verbose and coupled need to refactor
 	//1. check email is valid. and check email doesnt exist in DB.
-	//2. check password length complexity
-	//3. if both valid return "200" user created!!
-
-	//4. return json with error message
+	//2. send verification email!!!
+	//3. return Gson User not verified!
 
 	if req.Method != http.MethodPost {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
@@ -59,10 +60,20 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	resp, _ := json.Marshal(models.Message{"it worked!!!"})
-	w.Write(resp)
+	//check user is in the DB?
 
+	if r.DB.CheckExist(username) {
+		http.Error(w, "user already exists!!", http.StatusConflict)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	resp, _ := json.Marshal(models.User{
+		UserName: username,
+		Verified: false,
+		Password: []byte("boo"),
+	})
+	w.Write(resp)
 }
 
 func (c *CreateSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {

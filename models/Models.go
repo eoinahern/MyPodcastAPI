@@ -1,13 +1,18 @@
 package models
 
 type User struct {
-	UserName string
-	Password []byte
-	Podcasts []Podcast
+	UserName string `json: "username"`
+	Verified bool   `json: "verified"`
+	Password []byte `json: "password"`
+}
+
+type Session struct {
+	UserName   string
+	SessionKey string
 }
 
 type Message struct {
-	Message string `json: "Message"`
+	Message string `json: "message"`
 }
 
 type Podcast struct {
@@ -15,7 +20,6 @@ type Podcast struct {
 	Icon     string
 	Name     string //name of podcast
 	Details  string //info about the podcast
-	Episodes []Episode
 }
 
 type Episode struct {
