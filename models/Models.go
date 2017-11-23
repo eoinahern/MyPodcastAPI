@@ -1,5 +1,9 @@
 package models
 
+type DBConfig struct {
+	Port string `json: "port"`
+}
+
 type User struct {
 	UserName string `json: "username"`
 	Verified bool   `json: "verified"`
