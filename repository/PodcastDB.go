@@ -1,9 +1,13 @@
 package repository
 
-import "my_podcast_api/models"
+import (
+	"my_podcast_api/models"
+
+	"github.com/jinzhu/gorm"
+)
 
 type PodcastDB struct {
-	*DB
+	*gorm.DB
 }
 
 func (DB *PodcastDB) getAll() {

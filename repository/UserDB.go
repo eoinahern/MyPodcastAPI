@@ -1,14 +1,28 @@
 package repository
 
 import (
+	"fmt"
 	"my_podcast_api/models"
+
+	"github.com/jinzhu/gorm"
 )
 
 type UserDB struct {
-	*DB
+	*gorm.DB
 }
 
 func (DB *UserDB) CheckExist(email string) bool {
+
+	var count int = 0
+	DB.Model(&models.User{}).Where("user_name = ?", email).Count(&count)
+
+	str := fmt.Sprintf("count : %d", count)
+	fmt.Println(str)
+
+	if count >= 1 {
+		return true
+	}
+
 	return false
 }
 

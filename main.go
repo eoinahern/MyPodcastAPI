@@ -10,6 +10,8 @@ import (
 	"my_podcast_api/validation"
 	"net/http"
 	"os"
+
+	"github.com/jinzhu/gorm"
 )
 
 func main() {
@@ -25,17 +27,21 @@ func main() {
 	decoder.Decode(&dbConfig)
 
 	conf := fmt.Sprintf("%s:%s@/%s", dbConfig.User, dbConfig.Password, dbConfig.Schema)
-	fmt.Println(conf)
 
-	dbinst := &repository.DB{}
-	db, err := dbinst.Open("mysql", conf)
+	db, err := gorm.Open("mysql", conf)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	emailValidator := &validation.EmailValidation{}
 	userDB := &repository.UserDB{db}
-	episodeDB := &repository.EpisodeDB{db}
-	podcastDB := &repository.PodcastDB{db}
+	//episodeDB := &repository.EpisodeDB{db}
+	//podcastDB := &repository.PodcastDB{db}
+
+	defer userDB.Close()
 
 	http.Handle("/register", &routes.RegisterHandler{EmailValidator: emailValidator, DB: userDB})
-	http.Handle("/createsession", &routes.CreateSessionHandler{})
+	//http.Handle("/createsession", &routes.CreateSessionHandler{})
 	http.ListenAndServe(":8080", nil)
 }
