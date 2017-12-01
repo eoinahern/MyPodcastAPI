@@ -16,7 +16,6 @@ type DB struct {
 func (mdb *DB) Open(dialect string, details string) (*DB, error) {
 
 	db, err := gorm.Open(dialect, details)
-
 	defer db.Close()
 
 	if err != nil {

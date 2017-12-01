@@ -1,9 +1,11 @@
 package repository
 
-import "my_podcast_api/models"
+import (
+	"my_podcast_api/models"
+)
 
 type UserDB struct {
-	DB *DB
+	*DB
 }
 
 func (DB *UserDB) CheckExist(email string) bool {
@@ -13,6 +15,7 @@ func (DB *UserDB) CheckExist(email string) bool {
 func (DB *UserDB) Insert(user *models.User) {
 
 	//inset a row into the database table for users
+	DB.Save(user)
 
 }
 
