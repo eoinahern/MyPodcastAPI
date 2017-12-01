@@ -1,18 +1,16 @@
 package models
 
 type DBConfig struct {
-	Port string `json: "port"`
+	Port     string `json: "port"`
+	Password string `json: "password"`
+	User     string `json: "user"`
+	Schema   string `json: "schema"`
 }
 
 type User struct {
-	UserName string `json: "username"`
-	Verified bool   `json: "verified"`
-	Password string `json: "password"`
-}
-
-type Session struct {
-	UserName   string
-	SessionKey string
+	UserName string `json: "username"  gorm: "type:TEXT; primary_key; not null; unique"`
+	Verified bool   `json: "verified" gorm: "type : "BOOLEAN" `
+	Password string `json: "password" gorm "type: TEXT"`
 }
 
 type Message struct {

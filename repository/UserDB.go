@@ -3,6 +3,7 @@ package repository
 import "my_podcast_api/models"
 
 type UserDB struct {
+	DB *DB
 }
 
 func (DB *UserDB) CheckExist(email string) bool {

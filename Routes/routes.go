@@ -77,11 +77,11 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	//encrypt password!! and then insert!!
-	r.DB.Insert(user)
+	/*r.DB.Insert(user)
 
 	w.Header().Set("Content-Type", "application/json")
 	resp, _ := json.Marshal(user)
-	w.Write(resp)
+	w.Write(resp)*/
 }
 
 func (c *CreateSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
