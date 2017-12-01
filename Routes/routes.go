@@ -16,6 +16,7 @@ type RegisterHandler struct {
 }
 
 type CreateSessionHandler struct {
+	DB *repository.UserDB
 }
 
 type ReCreateSession struct {
@@ -40,10 +41,6 @@ type DeleteEpisodeHandler struct {
 }
 
 func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	// this is overly verbose and coupled need to refactor
-	//1. check email is valid. and check email doesnt exist in DB.
-	//2. send verification email!!!
-	//3. return Gson User not verified!
 
 	if req.Method != http.MethodPost {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
@@ -85,14 +82,19 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func (c *CreateSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+
 	if req.Method == http.MethodPost {
 
-		pass := req.FormValue("password")
-		if len(pass) > 0 {
-			//and user name and pass existy in the DB then
-			// return the key to be used by the user. create UUID!!
-			io.WriteString(w, "10101010101010110")
-			return
+		decoder := json.NewDecoder(req.Body)
+		var user models.User
+		err := decoder.Decode(&user)
+
+		if err != nil {
+			http.Error(w, "internal error", http.StatusInternalServerError)
+		}
+
+		if c.DB.CheckExist(user.UserName) {
+			w.Write([]byte("well hello there!!!"))
 		}
 
 	} else {

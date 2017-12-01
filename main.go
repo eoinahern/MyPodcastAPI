@@ -12,6 +12,7 @@ import (
 	"os"
 
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 func main() {
@@ -39,9 +40,11 @@ func main() {
 	//episodeDB := &repository.EpisodeDB{db}
 	//podcastDB := &repository.PodcastDB{db}
 
+	db.AutoMigrate(&models.User{})
+
 	defer userDB.Close()
 
 	http.Handle("/register", &routes.RegisterHandler{EmailValidator: emailValidator, DB: userDB})
-	//http.Handle("/createsession", &routes.CreateSessionHandler{})
+	http.Handle("/createsession", &routes.CreateSessionHandler{DB: userDB})
 	http.ListenAndServe(":8080", nil)
 }
