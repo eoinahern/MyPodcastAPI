@@ -8,9 +8,10 @@ type DBConfig struct {
 }
 
 type User struct {
-	UserName string `json: "username"  gorm: "type:TEXT; primary_key; not null; unique"`
-	Verified bool   `json: "verified" gorm: "type : "BOOLEAN" `
-	Password string `json: "password" gorm "type: TEXT"`
+	UserName string    `json: "username" gorm: "type:TEXT; primary_key; not null; unique"`
+	Verified bool      `json: "verified" gorm: "type : "BOOLEAN" `
+	Password string    `json: "password" gorm: "type: TEXT"`
+	Podcasts []Podcast `json: "podcasts" gorm: "ForeignKey:UserName"`
 }
 
 type Message struct {
@@ -18,16 +19,17 @@ type Message struct {
 }
 
 type Podcast struct {
-	Username string
-	Icon     string
-	Name     string //name of podcast
-	Details  string //info about the podcast
+	Icon     string    `json: "icon"`
+	Name     string    `json: "name"`     //name of podcast
+	Details  string    `json : "details"` //info about the podcast
+	Episodes []Episode `json: "episodes"`
 }
 
 type Episode struct {
-	Episode   int32
-	Created   string
-	URL       string
-	Downloads int32
-	Details   string
+	Episode   int32  `json: "episode"`
+	Created   string `json: "created"`
+	Updated   string `json: "updated"`
+	URL       string `json: "url"`
+	Downloads int32  `json: downloads`
+	Details   string `json: "details"`
 }

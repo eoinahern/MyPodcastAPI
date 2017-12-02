@@ -48,7 +48,6 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	decoder := json.NewDecoder(req.Body)
-
 	var user models.User
 	err := decoder.Decode(&user)
 
