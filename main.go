@@ -37,14 +37,17 @@ func main() {
 
 	emailValidator := &validation.EmailValidation{}
 	userDB := &repository.UserDB{db}
-	//episodeDB := &repository.EpisodeDB{db}
-	//podcastDB := &repository.PodcastDB{db}
+	episodeDB := &repository.EpisodeDB{db}
+	podcastDB := &repository.PodcastDB{db}
 
-	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.User{}, &models.Podcast{}, &models.Episode{})
 
 	defer userDB.Close()
 
 	http.Handle("/register", &routes.RegisterHandler{EmailValidator: emailValidator, DB: userDB})
 	http.Handle("/createsession", &routes.CreateSessionHandler{DB: userDB})
+	http.Handle("/getpodcasts", &routes.GetPodcastsHandler{UserDB: userDB, PodcastDB: podcastDB})
+	http.Handle("/getepisodes", &routes.GetEpisodesHandler{UserDB: userDB, EpisodeDB: episodeDB})
+
 	http.ListenAndServe(":8080", nil)
 }

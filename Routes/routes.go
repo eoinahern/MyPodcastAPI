@@ -26,9 +26,13 @@ type EndSessionHandler struct {
 }
 
 type GetPodcastsHandler struct {
+	UserDB    *repository.UserDB
+	PodcastDB *repository.PodcastDB
 }
 
 type GetEpisodesHandler struct {
+	UserDB    *repository.UserDB
+	EpisodeDB *repository.EpisodeDB
 }
 
 type DownloadEpisodeHandler struct {
@@ -109,5 +113,18 @@ func (e *EndSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) 
 	} else {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 	}
+
+}
+
+// get a list of the most popular podcasts and return to the users
+// in json format
+
+func (g *GetPodcastsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+
+}
+
+//get episodes from a specific podcast
+
+func (e *GetEpisodesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 }
