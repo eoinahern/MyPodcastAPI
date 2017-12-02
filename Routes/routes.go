@@ -36,9 +36,14 @@ type GetEpisodesHandler struct {
 }
 
 type DownloadEpisodeHandler struct {
+	//need folder location!! key and credentials.
+	//transmit file across network
 }
 
 type UploadEpisodeHandler struct {
+	//credentials. then upload to network
+	UserDB    *repository.UserDB
+	EpisodeDB *repository.EpisodeDB
 }
 
 type DeleteEpisodeHandler struct {
@@ -126,5 +131,9 @@ func (g *GetPodcastsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 //get episodes from a specific podcast
 
 func (e *GetEpisodesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+
+}
+
+func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 }

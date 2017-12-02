@@ -48,6 +48,7 @@ func main() {
 	http.Handle("/createsession", &routes.CreateSessionHandler{DB: userDB})
 	http.Handle("/getpodcasts", &routes.GetPodcastsHandler{UserDB: userDB, PodcastDB: podcastDB})
 	http.Handle("/getepisodes", &routes.GetEpisodesHandler{UserDB: userDB, EpisodeDB: episodeDB})
+	http.Handle("upload", &routes.UploadEpisodeHandler{UserDB: userDB, EpisodeDB: episodeDB})
 
 	http.ListenAndServe(":8080", nil)
 }
