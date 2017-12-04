@@ -23,10 +23,7 @@ func (DB *UserDB) CheckExist(email string) bool {
 }
 
 func (DB *UserDB) Insert(user *models.User) {
-
-	//inset a row into the database table for users
 	DB.Save(user)
-
 }
 
 func (DB *UserDB) GetItem(email string) *models.User {

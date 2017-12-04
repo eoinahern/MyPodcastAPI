@@ -50,5 +50,5 @@ func main() {
 	http.Handle("/getepisodes", &routes.GetEpisodesHandler{UserDB: userDB, EpisodeDB: episodeDB})
 	http.Handle("upload", &routes.UploadEpisodeHandler{UserDB: userDB, EpisodeDB: episodeDB})
 
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", nil)
 }
