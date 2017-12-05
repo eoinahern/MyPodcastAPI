@@ -1,10 +1,11 @@
 package models
 
-type DBConfig struct {
-	Port     string `json: "port"`
-	Password string `json: "password"`
-	User     string `json: "user"`
-	Schema   string `json: "schema"`
+type Config struct {
+	Port       string `json: "port"`
+	Password   string `json: "password"`
+	User       string `json: "user"`
+	Schema     string `json: "schema"`
+	SigningKey string `json: "signingkey"`
 }
 
 type User struct {

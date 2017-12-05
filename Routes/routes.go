@@ -5,6 +5,7 @@ import (
 	"io"
 	"my_podcast_api/models"
 	"my_podcast_api/repository"
+	"my_podcast_api/util"
 	"my_podcast_api/validation"
 	"net/http"
 )
@@ -16,7 +17,8 @@ type RegisterHandler struct {
 }
 
 type CreateSessionHandler struct {
-	DB *repository.UserDB
+	DB           *repository.UserDB
+	JwtTokenUtil *util.JwtTokenUtil
 }
 
 type ReCreateSession struct {
@@ -102,7 +104,7 @@ func (c *CreateSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 		}
 
 		if c.DB.ValidatePasswordAndUser(user.UserName, user.Password) {
-			user.Token = "new lovely token!!!!"
+			user.Token = c.JwtTokenUtil.CreateToken(user.UserName)
 			jsonUser, _ := json.Marshal(user)
 			w.Write(jsonUser)
 		}

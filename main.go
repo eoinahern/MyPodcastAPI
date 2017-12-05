@@ -7,6 +7,7 @@ import (
 	"my_podcast_api/models"
 	"my_podcast_api/repository"
 	"my_podcast_api/routes"
+	"my_podcast_api/util"
 	"my_podcast_api/validation"
 	"net/http"
 	"os"
@@ -24,17 +25,17 @@ func main() {
 	}
 
 	decoder := json.NewDecoder(file)
-	dbConfig := &models.DBConfig{}
-	decoder.Decode(&dbConfig)
+	config := &models.Config{}
+	decoder.Decode(&config)
 
-	conf := fmt.Sprintf("%s:%s@/%s", dbConfig.User, dbConfig.Password, dbConfig.Schema)
-
+	conf := fmt.Sprintf("%s:%s@/%s", config.User, config.Password, config.Schema)
 	db, err := gorm.Open("mysql", conf)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	jwtTokenUtil := &util.JwtTokenUtil{SigningKey: config.SigningKey}
 	emailValidator := &validation.EmailValidation{}
 	userDB := &repository.UserDB{db}
 	episodeDB := &repository.EpisodeDB{db}
@@ -45,7 +46,7 @@ func main() {
 	defer userDB.Close()
 
 	http.Handle("/register", &routes.RegisterHandler{EmailValidator: emailValidator, DB: userDB})
-	http.Handle("/createsession", &routes.CreateSessionHandler{DB: userDB})
+	http.Handle("/createsession", &routes.CreateSessionHandler{DB: userDB, JwtTokenUtil: jwtTokenUtil})
 	http.Handle("/getpodcasts", &routes.GetPodcastsHandler{UserDB: userDB, PodcastDB: podcastDB})
 	http.Handle("/getepisodes", &routes.GetEpisodesHandler{UserDB: userDB, EpisodeDB: episodeDB})
 	http.Handle("/upload", &routes.UploadEpisodeHandler{UserDB: userDB, EpisodeDB: episodeDB})

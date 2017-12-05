@@ -1,16 +1,31 @@
 package util
 
+import (
+	"time"
+
+	jwt "github.com/dgrijalva/jwt-go"
+)
 
 type JwtTokenUtil struct {
-  token string
+	SigningKey string
 }
 
+func (j *JwtTokenUtil) CreateToken(username string) string {
 
-func (j * JwtTokenUtil) createToken() string {
-  return ""
+	token := jwt.New(jwt.SigningMethodHS256)
+
+	claims := token.Claims.(jwt.MapClaims)
+	claims["name"] = username
+	claims["exp"] = time.Now().Add(time.Hour + 1).Unix()
+
+	signedToken, _ := token.SignedString(j.signingKey)
+
+	return signedToken
+
 }
 
+//make sure the token sent is correct!!!
 
-func (j *JwtTokenUtil) checkUser() bool {
-  return true
+func (j *JwtTokenUtil) CheckTokenCredentials(token *jwt.Token) bool {
+
 }
