@@ -1,6 +1,7 @@
 package util
 
 import (
+	"log"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -18,14 +19,17 @@ func (j *JwtTokenUtil) CreateToken(username string) string {
 	claims["name"] = username
 	claims["exp"] = time.Now().Add(time.Hour + 1).Unix()
 
-	signedToken, _ := token.SignedString(j.signingKey)
+	signedToken, err := token.SignedString([]byte(j.SigningKey))
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return signedToken
-
 }
 
 //make sure the token sent is correct!!!
 
 func (j *JwtTokenUtil) CheckTokenCredentials(token *jwt.Token) bool {
-
+	return true
 }
