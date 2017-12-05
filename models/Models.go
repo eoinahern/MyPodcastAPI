@@ -11,6 +11,7 @@ type User struct {
 	UserName string    `json: "username" gorm: "type:TEXT; primary_key; not null; unique"`
 	Verified bool      `json: "verified" gorm: "type : "BOOLEAN" `
 	Password string    `json: "password" gorm: "type: TEXT"`
+	Token    string    `json: "token" `
 	Podcasts []Podcast `json: "podcasts" gorm: "ForeignKey:UserEmail;AssociationForeignKey:UserName"`
 }
 

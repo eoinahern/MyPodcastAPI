@@ -101,10 +101,11 @@ func (c *CreateSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 			http.Error(w, "internal error", http.StatusInternalServerError)
 		}
 
-		if c.DB.CheckExist(user.UserName) {
-			w.Write([]byte("well hello there!!!"))
+		if c.DB.ValidatePasswordAndUser(user.UserName, user.Password) {
+			user.Token = "new lovely token!!!!"
+			jsonUser, _ := json.Marshal(user)
+			w.Write(jsonUser)
 		}
-
 	} else {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 	}
@@ -135,5 +136,9 @@ func (e *GetEpisodesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 }
 
 func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+
+	//need header authorisation. check legit?
+	//if so add files info to database.
+	//then upload file to folder. username/podcastname/files.extension
 
 }

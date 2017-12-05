@@ -22,6 +22,10 @@ func (DB *UserDB) CheckExist(email string) bool {
 	return false
 }
 
+func (DB *UserDB) ValidatePasswordAndUser(email string, password string) bool {
+	return true
+}
+
 func (DB *UserDB) Insert(user *models.User) {
 	DB.Save(user)
 }

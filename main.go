@@ -48,7 +48,7 @@ func main() {
 	http.Handle("/createsession", &routes.CreateSessionHandler{DB: userDB})
 	http.Handle("/getpodcasts", &routes.GetPodcastsHandler{UserDB: userDB, PodcastDB: podcastDB})
 	http.Handle("/getepisodes", &routes.GetEpisodesHandler{UserDB: userDB, EpisodeDB: episodeDB})
-	http.Handle("upload", &routes.UploadEpisodeHandler{UserDB: userDB, EpisodeDB: episodeDB})
+	http.Handle("/upload", &routes.UploadEpisodeHandler{UserDB: userDB, EpisodeDB: episodeDB})
 
 	http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", nil)
 }
