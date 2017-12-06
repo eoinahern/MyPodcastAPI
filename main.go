@@ -35,6 +35,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	//create dependencies
+	passEncryptUtil := &util.PasswordEncryptUtil{}
 	jwtTokenUtil := &util.JwtTokenUtil{SigningKey: config.SigningKey}
 	emailValidator := &validation.EmailValidation{}
 	userDB := &repository.UserDB{db}
@@ -44,9 +46,8 @@ func main() {
 	db.AutoMigrate(&models.User{}, &models.Podcast{}, &models.Episode{})
 
 	defer userDB.Close()
-
-	http.Handle("/register", &routes.RegisterHandler{EmailValidator: emailValidator, DB: userDB})
-	http.Handle("/createsession", &routes.CreateSessionHandler{DB: userDB, JwtTokenUtil: jwtTokenUtil})
+	http.Handle("/register", &routes.RegisterHandler{EmailValidator: emailValidator, DB: userDB, PassEncryptUtil: passEncryptUtil})
+	http.Handle("/createsession", &routes.CreateSessionHandler{DB: userDB, JwtTokenUtil: jwtTokenUtil, PassEncryptUtil: passEncryptUtil})
 	http.Handle("/getpodcasts", &routes.GetPodcastsHandler{UserDB: userDB, PodcastDB: podcastDB})
 	http.Handle("/getepisodes", &routes.GetEpisodesHandler{UserDB: userDB, EpisodeDB: episodeDB})
 	http.Handle("/upload", &routes.UploadEpisodeHandler{UserDB: userDB, EpisodeDB: episodeDB})

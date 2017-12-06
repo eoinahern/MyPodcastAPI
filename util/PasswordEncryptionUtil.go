@@ -9,7 +9,7 @@ import (
 type PasswordEncryptUtil struct {
 }
 
-func (p *PasswordEncryptUtil) encrypt(password string) string {
+func (p *PasswordEncryptUtil) Encrypt(password string) string {
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
@@ -17,12 +17,12 @@ func (p *PasswordEncryptUtil) encrypt(password string) string {
 		log.Fatal(err)
 	}
 
-	return hash
+	return string(hash)
 }
 
-func (p *PasswordEncryptUtil) checkSame(DBpassword string, sentPassword string) bool {
+func (p *PasswordEncryptUtil) CheckSame(DBpassword string, sentPassword string) bool {
 
-	if err := bcrypt.CompareHashAndPassword(DBpassword, []byte(sentPassword)); err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(DBpassword), []byte(sentPassword)); err != nil {
 		return false
 	} else {
 		return true

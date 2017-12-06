@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"my_podcast_api/models"
 
 	"github.com/jinzhu/gorm"
@@ -23,16 +24,31 @@ func (DB *UserDB) CheckExist(email string) bool {
 }
 
 func (DB *UserDB) ValidatePasswordAndUser(email string, password string) bool {
-	return true
+
+	str := fmt.Sprintf("passed in : ? , ? ", email, password)
+	fmt.Println(str)
+
+	var user models.User
+	DB.Where("user_name = ? AND password = ?", email, password).First(&user)
+
+	fmt.Println(user.UserName)
+
+	if user.UserName == email {
+		return true
+	} else {
+		return false
+	}
 }
 
 func (DB *UserDB) Insert(user *models.User) {
 	DB.Save(user)
 }
 
-func (DB *UserDB) GetItem(email string) *models.User {
+func (DB *UserDB) GetUser(email string) models.User {
 
-	return &models.User{}
+	var user models.User
+	DB.Where("user_name = ?", email).First(&user)
+	return user
 }
 
 func (DB *UserDB) GetAll() {

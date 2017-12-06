@@ -12,13 +12,15 @@ import (
 
 //tregister user!!!
 type RegisterHandler struct {
-	EmailValidator *validation.EmailValidation
-	DB             *repository.UserDB
+	EmailValidator  *validation.EmailValidation
+	DB              *repository.UserDB
+	PassEncryptUtil *util.PasswordEncryptUtil
 }
 
 type CreateSessionHandler struct {
-	DB           *repository.UserDB
-	JwtTokenUtil *util.JwtTokenUtil
+	DB              *repository.UserDB
+	JwtTokenUtil    *util.JwtTokenUtil
+	PassEncryptUtil *util.PasswordEncryptUtil
 }
 
 type ReCreateSession struct {
@@ -83,7 +85,7 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//encrypt password!! and then insert!!
+	user.Password = r.PassEncryptUtil.Encrypt(user.Password)
 	r.DB.Create(user)
 
 	w.Header().Set("Content-Type", "application/json")
@@ -103,11 +105,18 @@ func (c *CreateSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 			http.Error(w, "internal error", http.StatusInternalServerError)
 		}
 
-		if c.DB.ValidatePasswordAndUser(user.UserName, user.Password) {
+		dbUser := c.DB.GetUser(user.UserName)
+
+		if c.PassEncryptUtil.CheckSame(dbUser.Password, user.Password) {
 			user.Token = c.JwtTokenUtil.CreateToken(user.UserName)
 			jsonUser, _ := json.Marshal(user)
 			w.Write(jsonUser)
+		} else {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"error" : "incorrect pass"}`))
 		}
+
 	} else {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 	}
