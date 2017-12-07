@@ -8,6 +8,7 @@ import (
 	"my_podcast_api/util"
 	"my_podcast_api/validation"
 	"net/http"
+	"strings"
 )
 
 //tregister user!!!
@@ -46,8 +47,9 @@ type DownloadEpisodeHandler struct {
 
 type UploadEpisodeHandler struct {
 	//credentials. then upload to network
-	UserDB    *repository.UserDB
-	EpisodeDB *repository.EpisodeDB
+	UserDB       *repository.UserDB
+	EpisodeDB    *repository.EpisodeDB
+	JwtTokenUtil *util.JwtTokenUtil
 }
 
 type DeleteEpisodeHandler struct {
@@ -148,8 +150,19 @@ func (e *GetEpisodesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 
 func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
-	//need header authorisation. check legit?
-	//if so add files info to database.
-	//then upload file to folder. username/podcastname/files.extension
+	//1.need header authorisation. check legit?
+	//2.if so add files info to database.
+	//3.then upload file to folder. username/podcastname/files.extension
+
+	reqToken := req.Header.Get("Authorization")
+	splitToken := strings.Split(reqToken, " ")
+	code, err := e.JwtTokenUtil.CheckTokenCredentials(splitToken[1])
+
+	if err != nil {
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(code)
+		w.Write([]byte(`{ "error" : "error occured"}`))
+	}
 
 }

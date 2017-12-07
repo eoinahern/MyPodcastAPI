@@ -37,11 +37,11 @@ func main() {
 
 	//create dependencies
 	passEncryptUtil := &util.PasswordEncryptUtil{}
-	jwtTokenUtil := &util.JwtTokenUtil{SigningKey: config.SigningKey}
 	emailValidator := &validation.EmailValidation{}
 	userDB := &repository.UserDB{db}
 	episodeDB := &repository.EpisodeDB{db}
 	podcastDB := &repository.PodcastDB{db}
+	jwtTokenUtil := &util.JwtTokenUtil{SigningKey: config.SigningKey, DB: userDB}
 
 	db.AutoMigrate(&models.User{}, &models.Podcast{}, &models.Episode{})
 
@@ -50,7 +50,7 @@ func main() {
 	http.Handle("/createsession", &routes.CreateSessionHandler{DB: userDB, JwtTokenUtil: jwtTokenUtil, PassEncryptUtil: passEncryptUtil})
 	http.Handle("/getpodcasts", &routes.GetPodcastsHandler{UserDB: userDB, PodcastDB: podcastDB})
 	http.Handle("/getepisodes", &routes.GetEpisodesHandler{UserDB: userDB, EpisodeDB: episodeDB})
-	http.Handle("/upload", &routes.UploadEpisodeHandler{UserDB: userDB, EpisodeDB: episodeDB})
+	http.Handle("/upload", &routes.UploadEpisodeHandler{UserDB: userDB, EpisodeDB: episodeDB, JwtTokenUtil: jwtTokenUtil})
 
 	http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", nil)
 }

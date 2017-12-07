@@ -2,6 +2,8 @@ package util
 
 import (
 	"log"
+	"my_podcast_api/repository"
+	"net/http"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -9,6 +11,7 @@ import (
 
 type JwtTokenUtil struct {
 	SigningKey string
+	DB         *repository.UserDB
 }
 
 func (j *JwtTokenUtil) CreateToken(username string) string {
@@ -28,8 +31,36 @@ func (j *JwtTokenUtil) CreateToken(username string) string {
 	return signedToken
 }
 
-//make sure the token sent is correct!!!
+func (j *JwtTokenUtil) CheckTokenCredentials(tokenStr string, userName string) (int, string) {
 
-func (j *JwtTokenUtil) CheckTokenCredentials(token *jwt.Token) bool {
+	token, err := jwt.Parse(tokenStr, func(passedToken *jwt.Token) (interface{}, error) {
+		return []byte(j.SigningKey), nil
+	})
+
+	if err != nil {
+		return http.StatusInternalServerError, "err"
+	}
+
+	claims := token.Claims.(jwt.MapClaims)
+	time := claims["exp"].(int64)
+	name := claims["name"].(string)
+
+	if !verifyTokenTime(time) || !verifyTokenUser(name) {
+		return http.StatusUnauthorized, "error validating token"
+	}
+
+	return -1, ""
+
+}
+
+func verifyTokenTime(chimey int64) bool {
+	return chimey < time.Now().Unix()
+}
+
+func verifyTokenUser(tokenName string, userName string) bool {
+
+	//check token and body contains same user.
+	//and exists in the DB
+
 	return true
 }
