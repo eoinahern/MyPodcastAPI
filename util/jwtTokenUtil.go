@@ -4,6 +4,7 @@ import (
 	"log"
 	"my_podcast_api/repository"
 	"net/http"
+	"strings"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -45,7 +46,7 @@ func (j *JwtTokenUtil) CheckTokenCredentials(tokenStr string, userName string) (
 	time := claims["exp"].(int64)
 	name := claims["name"].(string)
 
-	if !verifyTokenTime(time) || !verifyTokenUser(name) {
+	if !verifyTokenTime(time) || !j.verifyTokenUser(name, userName) {
 		return http.StatusUnauthorized, "error validating token"
 	}
 
@@ -57,10 +58,15 @@ func verifyTokenTime(chimey int64) bool {
 	return chimey < time.Now().Unix()
 }
 
-func verifyTokenUser(tokenName string, userName string) bool {
+func (j *JwtTokenUtil) verifyTokenUser(tokenName string, userName string) bool {
 
-	//check token and body contains same user.
-	//and exists in the DB
+	if strings.Compare(tokenName, userName) != 0 {
+		return false
+	}
+
+	if !j.DB.CheckExist(userName) {
+		return false
+	}
 
 	return true
 }

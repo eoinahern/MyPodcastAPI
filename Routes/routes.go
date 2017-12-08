@@ -165,4 +165,9 @@ func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 		w.Write([]byte(`{ "error" : "error occured"}`))
 	}
 
+	//decode obj sent
+	decoder := json.Decoder(req.Body)
+	var episode models.Episode
+	decoder.Decode(&episode)
+
 }
