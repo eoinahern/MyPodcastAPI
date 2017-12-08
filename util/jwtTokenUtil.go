@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"log"
 	"my_podcast_api/repository"
 	"net/http"
@@ -39,12 +40,15 @@ func (j *JwtTokenUtil) CheckTokenCredentials(tokenStr string, userName string) (
 	})
 
 	if err != nil {
-		return http.StatusInternalServerError, "err"
+		log.Println(err.Error())
 	}
 
 	claims := token.Claims.(jwt.MapClaims)
-	time := claims["exp"].(int64)
+	time := int64(claims["exp"].(float64))
 	name := claims["name"].(string)
+
+	//fmt.Println(name)
+	//fmt.Println(time)
 
 	if !verifyTokenTime(time) || !j.verifyTokenUser(name, userName) {
 		return http.StatusUnauthorized, "error validating token"
@@ -55,12 +59,19 @@ func (j *JwtTokenUtil) CheckTokenCredentials(tokenStr string, userName string) (
 }
 
 func verifyTokenTime(chimey int64) bool {
-	return chimey < time.Now().Unix()
+	if chimey > time.Now().Unix() {
+		fmt.Println("token isnt expired")
+		return true
+	} else {
+		fmt.Println("token is expired")
+		return false
+	}
 }
 
 func (j *JwtTokenUtil) verifyTokenUser(tokenName string, userName string) bool {
 
 	if strings.Compare(tokenName, userName) != 0 {
+		log.Print("name comparison failed")
 		return false
 	}
 
@@ -68,5 +79,6 @@ func (j *JwtTokenUtil) verifyTokenUser(tokenName string, userName string) bool {
 		return false
 	}
 
+	log.Print("name comparison succeed")
 	return true
 }

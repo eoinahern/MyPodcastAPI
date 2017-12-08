@@ -165,9 +165,6 @@ func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 		return
 	}
 
-	fmt.Println(episode.UserID)
-	fmt.Println(episode.Details)
-
 	reqToken := req.Header.Get("Authorization")
 	splitToken := strings.Split(reqToken, " ")
 	code, _ := e.JwtTokenUtil.CheckTokenCredentials(splitToken[1], episode.UserID)
