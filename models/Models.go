@@ -30,10 +30,10 @@ type Podcast struct {
 
 type Episode struct {
 	UserID    string `json: "userid"  gorm: "type:Text"`
-	Episode   int32  `json: "episode" gorm: "type: INTEGER"`
+	Data      []byte `json: "data"  gorm: "-"`
 	Created   string `json: "created" gorm: "type: TEXT"`
 	Updated   string `json: "updated" gorm: "type: TEXT"`
 	URL       string `json: "url" gorm: "type: TEXT"`
-	Downloads int32  `json: "downloads" gorm: "type: INTEGER"`
+	Downloads int32  `json: "downloads" gorm: "type: INTEGER; default:0"`
 	Details   string `json: "details" gorm: "type: TEXT"`
 }

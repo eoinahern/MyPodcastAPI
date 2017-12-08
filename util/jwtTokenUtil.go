@@ -50,7 +50,7 @@ func (j *JwtTokenUtil) CheckTokenCredentials(tokenStr string, userName string) (
 		return http.StatusUnauthorized, "error validating token"
 	}
 
-	return -1, ""
+	return 1, ""
 
 }
 

@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"my_podcast_api/models"
 	"my_podcast_api/repository"
@@ -154,20 +155,33 @@ func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 	//2.if so add files info to database.
 	//3.then upload file to folder. username/podcastname/files.extension
 
-	reqToken := req.Header.Get("Authorization")
-	splitToken := strings.Split(reqToken, " ")
-	code, err := e.JwtTokenUtil.CheckTokenCredentials(splitToken[1])
+	//decode obj sent
+	decoder := json.NewDecoder(req.Body)
+	var episode models.Episode
+	err := decoder.Decode(&episode)
 
 	if err != nil {
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(code)
-		w.Write([]byte(`{ "error" : "error occured"}`))
+		http.Error(w, "error", http.StatusInternalServerError)
+		return
 	}
 
-	//decode obj sent
-	decoder := json.Decoder(req.Body)
-	var episode models.Episode
-	decoder.Decode(&episode)
+	fmt.Println(episode.UserID)
+	fmt.Println(episode.Details)
+
+	reqToken := req.Header.Get("Authorization")
+	splitToken := strings.Split(reqToken, " ")
+	code, _ := e.JwtTokenUtil.CheckTokenCredentials(splitToken[1], episode.UserID)
+
+	fmt.Println(code)
+
+	/*if code != -1 {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(code)
+		w.Write([]byte(`{ "error" : "error" }`))
+	}*/
+
+	w.Write([]byte("alls weellllll"))
+
+	//write file to server directory based on userName
 
 }
