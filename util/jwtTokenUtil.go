@@ -39,7 +39,7 @@ func (j *JwtTokenUtil) CheckTokenCredentials(tokenStr string, userName string) (
 	})
 
 	if err != nil {
-		log.Println(err.Error())
+		return http.StatusUnauthorized, "error validating token"
 	}
 
 	claims := token.Claims.(jwt.MapClaims)

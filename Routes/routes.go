@@ -146,28 +146,44 @@ func (g *GetPodcastsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 	//1. authorize user...
 	//2. if authenticated. return most popular podcasts based on num downloads
 
-	var usertitle models.UserTitle
-	decoder := json.NewDecoder(req.Body)
-	decoder.Decode(&usertitle)
+	if req.Method == http.MethodPost {
 
-	token := req.Header.Get("Authorization")
-	tokenStr := strings.Split(token, " ")
-	code, _ := g.JwtTokenUtil.CheckTokenCredentials(tokenStr[1], usertitle.UserName)
+		var usertitle models.UserTitle
+		decoder := json.NewDecoder(req.Body)
+		decoder.Decode(&usertitle)
 
-	w.Header().Set("Content-Type", "application/json")
+		token := req.Header.Get("Authorization")
+		tokenSlice := strings.Split(token, " ")
 
-	if code != -1 {
-		w.WriteHeader(code)
-		w.Write([]byte(`{ "error" : "problem with token"}`))
-	}
+		w.Header().Set("Content-Type", "application/json")
 
-	podcasts := g.PodcastDB.GetAll()
-	podcastsMarshaled, err := json.Marshal(podcasts)
+		if len(tokenSlice) < 2 {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte(`{ "error" : "problem with token"}`))
+			return
+		}
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		code, _ := g.JwtTokenUtil.CheckTokenCredentials(tokenSlice[1], usertitle.UserName)
+
+		if code != -1 {
+			w.WriteHeader(code)
+			w.Write([]byte(`{ "error" : "problem with token"}`))
+			return
+		}
+
+		podcasts := g.PodcastDB.GetAll()
+		podcastsMarshaled, err := json.Marshal(podcasts)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"error": "internal error"}`))
+		} else {
+			w.Write(podcastsMarshaled)
+		}
+
 	} else {
-		json.Marshal(podcastsMarshaled)
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Write([]byte(`{ "error" : "not allowed"}`))
 	}
 
 }
