@@ -32,8 +32,9 @@ type EndSessionHandler struct {
 }
 
 type GetPodcastsHandler struct {
-	UserDB    *repository.UserDB
-	PodcastDB *repository.PodcastDB
+	UserDB       *repository.UserDB
+	PodcastDB    *repository.PodcastDB
+	JwtTokenUtil *util.JwtTokenUtil
 }
 
 type GetEpisodesHandler struct {
@@ -50,6 +51,7 @@ type UploadEpisodeHandler struct {
 	//credentials. then upload to network
 	UserDB       *repository.UserDB
 	EpisodeDB    *repository.EpisodeDB
+	PodcastDB    *repository.PodcastDB
 	JwtTokenUtil *util.JwtTokenUtil
 }
 
@@ -141,6 +143,33 @@ func (e *EndSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) 
 
 func (g *GetPodcastsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
+	//1. authorize user...
+	//2. if authenticated. return most popular podcasts based on num downloads
+
+	var usertitle models.UserTitle
+	decoder := json.NewDecoder(req.Body)
+	decoder.Decode(&usertitle)
+
+	token := req.Header.Get("Authorization")
+	tokenStr := strings.Split(token, " ")
+	code, _ := g.JwtTokenUtil.CheckTokenCredentials(tokenStr[1], usertitle.UserName)
+
+	w.Header().Set("Content-Type", "application/json")
+
+	if code != -1 {
+		w.WriteHeader(code)
+		w.Write([]byte(`{ "error" : "problem with token"}`))
+	}
+
+	podcasts := g.PodcastDB.GetAll()
+	podcastsMarshaled, err := json.Marshal(podcasts)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	} else {
+		json.Marshal(podcastsMarshaled)
+	}
+
 }
 
 //get episodes from a specific podcast
@@ -150,6 +179,8 @@ func (e *GetEpisodesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 }
 
 func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+
+	//need to pass podcast obj with slice of episodes
 
 	//1.need header authorisation. check legit?
 	//2.if so add files info to database.
@@ -171,14 +202,17 @@ func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 
 	fmt.Println(code)
 
-	/*if code != -1 {
+	if code != -1 {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(code)
 		w.Write([]byte(`{ "error" : "error" }`))
-	}*/
+	}
 
-	w.Write([]byte("alls weellllll"))
+	//1. check podcast name? if it doesnt exist create? file extension check?
+	//2. check podcast number from podcasts table. increment count by 1.
+	//3. hash file name. read file and save in directory.
+	//4. add file details to DB. return 200 ok
 
-	//write file to server directory based on userName
+	//e.PodcastDB.CheckPodcastUserName(episode.UserID)
 
 }

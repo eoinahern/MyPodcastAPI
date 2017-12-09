@@ -16,16 +16,21 @@ type User struct {
 	Podcasts []Podcast `json: "podcasts" gorm: "ForeignKey:UserEmail;AssociationForeignKey:UserName"`
 }
 
+type UserTitle struct {
+	UserName string `json: "username"`
+}
+
 type Message struct {
 	Message string `json: "message"`
 }
 
 type Podcast struct {
-	UserEmail string    `json: "useremail" gorm: "type:TEXT"`
-	Icon      string    `json: "icon"   gorm: "type:TEXT"`
-	Name      string    `json: "name" gorm: "type: TEXT"`    //name of podcast
-	Details   string    `json : "details" gorm: "type:TEXT"` //info about the podcast
-	Episodes  []Episode `json: "episodes"  gorm: "ForeignKey:UserID; AssociationForeignKey:UserEmail"`
+	UserEmail  string    `json: "useremail" gorm: "type:TEXT"`
+	Icon       string    `json: "icon"   gorm: "type:TEXT"`
+	Name       string    `json: "name" gorm: "type: TEXT"` //name of podcast
+	EpisodeNum int       `json: "episodenum" gorm: "type:INTEGER; default:0"`
+	Details    string    `json : "details" gorm: "type:TEXT"` //info about the podcast
+	Episodes   []Episode `json: "episodes"  gorm: "ForeignKey:UserID; AssociationForeignKey:UserEmail"`
 }
 
 type Episode struct {
