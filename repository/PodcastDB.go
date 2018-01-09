@@ -40,3 +40,7 @@ func (DB *PodcastDB) CheckPodcastUserName(userName string, podcastName string) b
 func (DB *PodcastDB) UpdatePodcast(podcast models.Podcast) bool {
 	return true
 }
+
+func (DB *PodcastDB) CreatePodcast(podcast models.Podcast) {
+	//save podcast details to db
+}
