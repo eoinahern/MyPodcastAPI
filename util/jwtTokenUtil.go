@@ -4,7 +4,6 @@ import (
 	"log"
 	"my_podcast_api/repository"
 	"net/http"
-	"strings"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -32,7 +31,7 @@ func (j *JwtTokenUtil) CreateToken(username string) string {
 	return signedToken
 }
 
-func (j *JwtTokenUtil) CheckTokenCredentials(tokenStr string, userName string) (int, string) {
+func (j *JwtTokenUtil) CheckTokenCredentials(tokenStr string) (int, string) {
 
 	token, err := jwt.Parse(tokenStr, func(passedToken *jwt.Token) (interface{}, error) {
 		return []byte(j.SigningKey), nil
@@ -46,7 +45,7 @@ func (j *JwtTokenUtil) CheckTokenCredentials(tokenStr string, userName string) (
 	time := int64(claims["exp"].(float64))
 	name := claims["name"].(string)
 
-	if !verifyTokenTime(time) || !j.verifyTokenUser(name, userName) {
+	if !verifyTokenTime(time) || !j.verifyTokenUser(name) {
 		return http.StatusUnauthorized, "error validating token"
 	}
 
@@ -63,14 +62,9 @@ func verifyTokenTime(chimey int64) bool {
 	}
 }
 
-func (j *JwtTokenUtil) verifyTokenUser(tokenName string, userName string) bool {
+func (j *JwtTokenUtil) verifyTokenUser(tokenName string) bool {
 
-	if strings.Compare(tokenName, userName) != 0 {
-		log.Println("name comparison failed")
-		return false
-	}
-
-	if !j.DB.CheckExist(userName) {
+	if !j.DB.CheckExist(tokenName) {
 		return false
 	}
 

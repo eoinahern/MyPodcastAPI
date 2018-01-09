@@ -22,6 +22,6 @@ func AddEpisode(email string, podcastName string) {
 
 }
 
-func UpdateEpisode() {
+func UpdateEpisode(episode *models.Episode) {
 
 }

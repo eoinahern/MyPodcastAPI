@@ -163,7 +163,7 @@ func (g *GetPodcastsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 			return
 		}
 
-		code, _ := g.JwtTokenUtil.CheckTokenCredentials(tokenSlice[1], usertitle.UserName)
+		code, _ := g.JwtTokenUtil.CheckTokenCredentials(tokenSlice[1])
 
 		if code != -1 {
 			w.WriteHeader(code)
@@ -213,22 +213,22 @@ func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 	}
 
 	reqToken := req.Header.Get("Authorization")
+	req.Header.Get("name")
 	splitToken := strings.Split(reqToken, " ")
-	code, _ := e.JwtTokenUtil.CheckTokenCredentials(splitToken[1], episode.UserID)
+	code, message := e.JwtTokenUtil.CheckTokenCredentials(splitToken[1])
 
 	fmt.Println(code)
 
 	if code != -1 {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(code)
-		w.Write([]byte(`{ "error" : "error" }`))
+		msg, _ := json.Marshal(models.Message{Message: message})
+		w.Write(msg)
 	}
 
 	//1. check podcast name? if it doesnt exist create? file extension check?
 	//2. check podcast number from podcasts table. increment count by 1.
 	//3. hash file name. read file and save in directory.
 	//4. add file details to DB. return 200 ok
-
-	//e.PodcastDB.CheckPodcastUserName(episode.UserID)
 
 }
