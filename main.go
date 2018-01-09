@@ -32,6 +32,7 @@ func main() {
 	db, err := gorm.Open("mysql", conf)
 
 	if err != nil {
+		fmt.Println(err)
 		log.Fatal(err)
 	}
 
@@ -43,13 +44,15 @@ func main() {
 	podcastDB := &repository.PodcastDB{db}
 	jwtTokenUtil := &util.JwtTokenUtil{SigningKey: config.SigningKey, DB: userDB}
 
-	defer userDB.Close()
-	defer podcastDB.Close()
-	defer episodeDB.Close()
-
 	db.AutoMigrate(&models.User{}, &models.Podcast{}, &models.Episode{})
-	db.Model(&models.Podcast{}).AddForeignKey("user_email", "users(user_name)", "RESTRICT", "RESTRICT")
+	db.Model(&models.Podcast{}).AddForeignKey("user_email", "users(user_name)", "CASCADE", "CASCADE")
 	db.Model(&models.Episode{}).AddForeignKey("pod_id", "podcasts(podcast_id)", "CASCADE", "CASCADE")
+
+	//defer userDB.Close()
+	//defer podcastDB.Close()
+	//defer episodeDB.Close()
+
+	defer db.Close()
 
 	http.Handle("/register", &routes.RegisterHandler{EmailValidator: emailValidator, DB: userDB, PassEncryptUtil: passEncryptUtil})
 	http.Handle("/createsession", &routes.CreateSessionHandler{DB: userDB, JwtTokenUtil: jwtTokenUtil, PassEncryptUtil: passEncryptUtil})
