@@ -13,7 +13,7 @@ type Config struct {
 }
 
 type User struct {
-	UserName string    `json: "username" gorm: "type:TEXT; primary_key; not null; unique"`
+	UserName string    `json: "username" gorm: "primary_key; type:TEXT; not null; unique"`
 	Verified bool      `json: "verified" gorm: "type : "BOOLEAN" `
 	Password string    `json: "password" gorm: "type: TEXT"`
 	Token    string    `json: "token" sql:"-" gorm:"-" `
@@ -29,7 +29,7 @@ type Message struct {
 }
 
 type Podcast struct {
-	PodcastID  int       `json: "podcastid"  gorm: "primary_key; AUTO_INCREMENT; type:INTEGER; not null"`
+	PodcastID  uint      `gorm: "primary_key; AUTO_INCREMENT; type:INTEGER; not null" json: "podcastid"`
 	UserEmail  string    `json: "useremail" gorm: "type:TEXT"`
 	Icon       string    `json: "icon"   gorm: "type:TEXT"`
 	Name       string    `json: "name" gorm: "type: TEXT"`
@@ -39,7 +39,7 @@ type Podcast struct {
 }
 
 type Episode struct {
-	PodID     int    `json: "podid" gorm: "type:INTEGER"`
+	PodID     uint   `gorm: "type:INTEGER" json: "podid"`
 	Created   string `json: "created" gorm: "type: TEXT"`
 	Updated   string `json: "updated" gorm: "type: TEXT"`
 	URL       string `json: "url" gorm: "type: TEXT"`

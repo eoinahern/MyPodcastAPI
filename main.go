@@ -48,9 +48,8 @@ func main() {
 	defer episodeDB.Close()
 
 	db.AutoMigrate(&models.User{}, &models.Podcast{}, &models.Episode{})
-	db.Model(&models.Podcast{}).AddForeignKey("user_email", "users(user_name)", "CASCADE", "CASCADE").GetErrors()
-
-	//db.Model(&models.Episode{}).AddForeignKey("pod_id", "podcasts(podcast_id)", "CASCADE", "CASCADE")
+	db.Model(&models.Podcast{}).AddForeignKey("user_email", "users(user_name)", "RESTRICT", "RESTRICT")
+	db.Model(&models.Episode{}).AddForeignKey("pod_id", "podcasts(podcast_id)", "CASCADE", "CASCADE")
 
 	http.Handle("/register", &routes.RegisterHandler{EmailValidator: emailValidator, DB: userDB, PassEncryptUtil: passEncryptUtil})
 	http.Handle("/createsession", &routes.CreateSessionHandler{DB: userDB, JwtTokenUtil: jwtTokenUtil, PassEncryptUtil: passEncryptUtil})
