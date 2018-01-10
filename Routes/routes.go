@@ -117,6 +117,7 @@ func (c *CreateSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 		if c.PassEncryptUtil.CheckSame(dbUser.Password, user.Password) {
 			user.Token = c.JwtTokenUtil.CreateToken(user.UserName)
 			jsonUser, _ := json.Marshal(user)
+			w.Header().Set("Content-Type", "application/json")
 			w.Write(jsonUser)
 		} else {
 			w.Header().Set("Content-Type", "application/json")
@@ -148,11 +149,7 @@ func (g *GetPodcastsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 	//1. authorize user...
 	//2. if authenticated. return most popular podcasts based on num downloads
 
-	if req.Method == http.MethodPost {
-
-		var usertitle models.UserTitle
-		decoder := json.NewDecoder(req.Body)
-		decoder.Decode(&usertitle)
+	if req.Method == http.MethodGet {
 
 		token := req.Header.Get("Authorization")
 		tokenSlice := strings.Split(token, " ")

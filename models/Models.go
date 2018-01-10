@@ -29,7 +29,7 @@ type Message struct {
 }
 
 type Podcast struct {
-	PodcastID  uint      `gorm:"primary_key;AUTO_INCREMENT;type:INTEGER"  json:"podcastid"`
+	PodcastID  int       `gorm:"primary_key"  json:"podcastid"`
 	UserEmail  string    `json:"useremail" gorm:"type:VARCHAR(80)"`
 	Icon       string    `json:"icon"   gorm:"type:TEXT"`
 	Name       string    `json:"name" gorm:"type: TEXT"`
