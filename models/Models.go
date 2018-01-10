@@ -38,6 +38,15 @@ type Podcast struct {
 	Episodes   []Episode `json:"episodes"  gorm:"ForeignKey:PodID"`
 }
 
+type SecurePodcast struct {
+	PodcastID  uint      `json:"podcastid"`
+	Icon       string    `json:"icon"`
+	Name       string    `json:"name" `
+	EpisodeNum int       `json:"episodenum"`
+	Details    string    `json:"details"`
+	Episodes   []Episode `json:"episodes"`
+}
+
 type Episode struct {
 	PodID     uint   `gorm:"type:INTEGER" json:"podid"`
 	Created   string `json:"created" gorm:"type: TEXT"`

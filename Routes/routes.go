@@ -56,6 +56,8 @@ type UploadEpisodeHandler struct {
 }
 
 type DeleteEpisodeHandler struct {
+	UserDB    *repository.UserDB
+	PodcastDB *repository.PodcastDB
 }
 
 func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -188,7 +190,10 @@ func (g *GetPodcastsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 
 }
 
-//get episodes from a specific podcast
+/**
+*	get episodes from a specific podcast
+* by podcast id and name!!!
+**/
 
 func (e *GetEpisodesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 

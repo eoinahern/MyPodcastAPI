@@ -48,10 +48,6 @@ func main() {
 	db.Model(&models.Podcast{}).AddForeignKey("user_email", "users(user_name)", "CASCADE", "CASCADE")
 	db.Model(&models.Episode{}).AddForeignKey("pod_id", "podcasts(podcast_id)", "CASCADE", "CASCADE")
 
-	//defer userDB.Close()
-	//defer podcastDB.Close()
-	//defer episodeDB.Close()
-
 	defer db.Close()
 
 	http.Handle("/register", &routes.RegisterHandler{EmailValidator: emailValidator, DB: userDB, PassEncryptUtil: passEncryptUtil})
