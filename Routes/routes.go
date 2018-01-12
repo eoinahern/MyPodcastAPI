@@ -2,7 +2,6 @@ package routes
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"my_podcast_api/models"
 	"my_podcast_api/repository"
@@ -29,6 +28,11 @@ type ReCreateSession struct {
 }
 
 type EndSessionHandler struct {
+}
+
+type CreatePodcastHandler struct {
+	PodcastDB    *repository.PodcastDB
+	JwtTokenUtil *util.JwtTokenUtil
 }
 
 type GetPodcastsHandler struct {
@@ -58,6 +62,22 @@ type UploadEpisodeHandler struct {
 type DeleteEpisodeHandler struct {
 	UserDB    *repository.UserDB
 	PodcastDB *repository.PodcastDB
+}
+
+var tokenErr []byte = []byte(`{ "error" : "problem with token"}`)
+var internalErr []byte = []byte(`{ "error" : "internal error"}`)
+
+func getTokenFromHeader(req *http.Request) string {
+
+	token := req.Header.Get("Authorization")
+	tokenSlice := strings.Split(token, " ")
+
+	if len(tokenSlice) != 2 {
+		return ""
+	}
+
+	return tokenSlice[1]
+
 }
 
 func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -141,6 +161,35 @@ func (e *EndSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) 
 
 }
 
+//create a podcast enntry and folder on server.
+
+func (c *CreatePodcastHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+
+	//1. authorize user .....
+	//2. create user folder if not exists. create podcast folder.
+	//3. store data in DB about podcast
+	//3. return success
+
+	if req.Method == http.MethodPost {
+
+		w.Header().Set("Content-Type", "application/json")
+
+		token := getTokenFromHeader(req)
+		code, _ := c.JwtTokenUtil.CheckTokenCredentials(token)
+
+		if code != -1 {
+			w.WriteHeader(code)
+			w.Write(tokenErr)
+			return
+		}
+
+	} else {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Write(tokenErr)
+	}
+
+}
+
 // get a list of the most popular podcasts and return to the users
 // in json format
 
@@ -151,22 +200,13 @@ func (g *GetPodcastsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 
 	if req.Method == http.MethodGet {
 
-		token := req.Header.Get("Authorization")
-		tokenSlice := strings.Split(token, " ")
-
+		token := getTokenFromHeader(req)
 		w.Header().Set("Content-Type", "application/json")
-
-		if len(tokenSlice) < 2 {
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte(`{ "error" : "problem with token"}`))
-			return
-		}
-
-		code, _ := g.JwtTokenUtil.CheckTokenCredentials(tokenSlice[1])
+		code, _ := g.JwtTokenUtil.CheckTokenCredentials(token)
 
 		if code != -1 {
 			w.WriteHeader(code)
-			w.Write([]byte(`{ "error" : "problem with token"}`))
+			w.Write(tokenErr)
 			return
 		}
 
@@ -175,7 +215,7 @@ func (g *GetPodcastsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`{"error": "internal error"}`))
+			w.Write(internalErr)
 		} else {
 			w.Write(podcastsMarshaled)
 		}
@@ -206,20 +246,17 @@ func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 
 	//decode obj sent
 	decoder := json.NewDecoder(req.Body)
-	var episode models.Episode
-	err := decoder.Decode(&episode)
+	var podcast models.Podcast
+	err := decoder.Decode(&podcast)
 
 	if err != nil {
 		http.Error(w, "error", http.StatusInternalServerError)
 		return
 	}
 
-	reqToken := req.Header.Get("Authorization")
+	token := getTokenFromHeader(req)
 	req.Header.Get("name")
-	splitToken := strings.Split(reqToken, " ")
-	code, message := e.JwtTokenUtil.CheckTokenCredentials(splitToken[1])
-
-	fmt.Println(code)
+	code, message := e.JwtTokenUtil.CheckTokenCredentials(token)
 
 	if code != -1 {
 		w.Header().Set("Content-Type", "application/json")
