@@ -55,5 +55,8 @@ func (DB *PodcastDB) UpdatePodcast(podcast models.Podcast) bool {
 }
 
 func (DB *PodcastDB) CreatePodcast(podcast models.Podcast) {
-	DB.Save(podcast)
+
+	if err := DB.Save(podcast).Error; err != nil {
+		log.Println(err)
+	}
 }

@@ -118,7 +118,7 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	//check user is in the DB?
 
 	if r.DB.CheckExist(user.UserName) {
-		http.Error(w, "user already exists!!", http.StatusConflict)
+		http.Error(w, http.StatusText(31), http.StatusConflict)
 		return
 	}
 
@@ -206,9 +206,15 @@ func (c *CreatePodcastHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 
 		if !c.FileHelper.CheckDirFileExists(path) {
 			c.FileHelper.CreateDir(path)
-		}
+			pod := models.Podcast{}
+			pod.Location = path
+			c.PodcastDB.CreatePodcast(pod)
 
-		//add data to DB return success
+			//check error?. if worked return podcast obj else return StatusInternalServerError
+
+		} else {
+			http.Error(w, http.StatusText(31), http.StatusConflict)
+		}
 
 	} else {
 		http.Error(w, notAllowedErrStr, http.StatusMethodNotAllowed)
