@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"my_podcast_api/models"
 	"my_podcast_api/repository"
 	"my_podcast_api/util"
@@ -72,7 +71,7 @@ var tokenErr []byte = []byte(`{ "error" : "problem with token"}`)
 var internalErr []byte = []byte(`{ "error" : "internal error"}`)
 
 const notAllowedErrStr string = "method not allowed"
-const podcastFiles string = "../files"
+const podcastFiles string = "./files"
 
 /**
 *	helper to get auth token
@@ -202,8 +201,6 @@ func (c *CreatePodcastHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 		}
 
 		podcastname := req.URL.Query().Get("podcastname")
-		log.Println(podcastname)
-		fmt.Println(podcastname)
 
 		if len(podcastname) == 0 {
 			http.Error(w, http.StatusText(22), http.StatusBadRequest)
@@ -211,23 +208,21 @@ func (c *CreatePodcastHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 		}
 
 		path := fmt.Sprintf("%s/%s/%s", podcastFiles, podcast.UserEmail, podcastname)
-		fmt.Println(path)
 
 		if !c.FileHelper.CheckDirFileExists(path) {
 			c.FileHelper.CreateDir(path)
+			fmt.Println(path)
 			podcast.Location = path
 			podcast.Name = podcastname
 			err = c.PodcastDB.CreatePodcast(podcast)
 
 			if err != nil {
 				http.Error(w, http.StatusText(51), http.StatusInternalServerError)
+				return
 			}
 
 			mpod, _ := json.Marshal(podcast)
 			w.Write(mpod)
-
-		} else {
-			http.Error(w, http.StatusText(31), http.StatusConflict)
 		}
 
 	} else {

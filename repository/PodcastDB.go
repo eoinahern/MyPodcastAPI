@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"log"
 	"my_podcast_api/models"
 
@@ -56,11 +57,12 @@ func (DB *PodcastDB) UpdatePodcast(podcast models.Podcast) bool {
 
 func (DB *PodcastDB) CreatePodcast(podcast models.Podcast) error {
 
-	err := DB.Save(podcast).Error
+	db := DB.Save(&podcast)
 
-	if err != nil {
-		log.Println(err)
+	if db.Error != nil {
+		fmt.Println(db.Error)
+		log.Println(db.Error)
 	}
 
-	return err
+	return db.Error
 }

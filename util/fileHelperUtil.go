@@ -34,7 +34,7 @@ func (f *FileHelperUtil) CheckMaxSizeAllowed() {
 
 func (f *FileHelperUtil) CreateDir(dirpath string) {
 
-	err := os.Mkdir(dirpath, 777)
+	err := os.MkdirAll(dirpath, os.FileMode(0511))
 
 	if err != nil {
 		log.Println(err)
