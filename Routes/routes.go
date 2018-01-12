@@ -33,6 +33,7 @@ type EndSessionHandler struct {
 type CreatePodcastHandler struct {
 	PodcastDB    *repository.PodcastDB
 	JwtTokenUtil *util.JwtTokenUtil
+	FileHelper   *util.FileHelperUtil
 }
 
 type GetPodcastsHandler struct {
@@ -188,6 +189,21 @@ func (c *CreatePodcastHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 			w.Write(tokenErr)
 			return
 		}
+
+		//navigate to use dir!!!
+
+		podcastname := req.URL.Query().Get("name")
+
+		if len(podcastname) == 0 {
+			http.Error(w, http.StatusText(22), http.StatusBadRequest)
+			return
+		}
+
+		if !c.FileHelper.CheckDirFileExists(podcastname) {
+			c.FileHelper.CreateDir()
+		}
+
+		//add data to DB return success
 
 	} else {
 		http.Error(w, notAllowedErrStr, http.StatusMethodNotAllowed)

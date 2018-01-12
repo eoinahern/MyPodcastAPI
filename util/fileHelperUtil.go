@@ -8,22 +8,18 @@ func createDIR() {
 
 }
 
-func checkDirFileExists(path string) bool {
+func (f *FileHelperUtil) CheckDirFileExists(name string) bool {
 	return false
 }
 
-func (f *FileHelperUtil) checkExtension() {
+func (f *FileHelperUtil) CheckExtension() bool {
+	return false
+}
+
+func (f *FileHelperUtil) CheckMaxSizeAllowed() {
 
 }
 
-func (f *FileHelperUtil) checkMaxSizeAllowed() {
-
-}
-
-func (f *FileHelperUtil) checkDir() bool {
-	return true
-}
-
-func (f *FileHelperUtil) createDir() {
+func (f *FileHelperUtil) CreateDir() {
 
 }

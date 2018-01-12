@@ -33,6 +33,7 @@ type Podcast struct {
 	UserEmail  string    `json:"useremail" gorm:"type:VARCHAR(80)"`
 	Icon       string    `json:"icon"   gorm:"type:TEXT"`
 	Name       string    `json:"name" gorm:"type: TEXT"`
+	Location   string    `json:"location" gorm:"type:VARCHAR(100)"`
 	EpisodeNum int       `json:"episodenum" gorm:"type:INTEGER; default:0"`
 	Details    string    `json:"details" gorm:"type:TEXT"`
 	Episodes   []Episode `json:"episodes"  gorm:"ForeignKey:PodID"`

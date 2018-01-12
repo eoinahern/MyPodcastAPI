@@ -39,6 +39,7 @@ func main() {
 	//create dependencies
 	passEncryptUtil := &util.PasswordEncryptUtil{}
 	emailValidator := &validation.EmailValidation{}
+	fileHelperutil := &util.FileHelperUtil{}
 	userDB := &repository.UserDB{db}
 	episodeDB := &repository.EpisodeDB{db}
 	podcastDB := &repository.PodcastDB{db}
@@ -54,6 +55,7 @@ func main() {
 	http.Handle("/createsession", &routes.CreateSessionHandler{DB: userDB, JwtTokenUtil: jwtTokenUtil, PassEncryptUtil: passEncryptUtil})
 	http.Handle("/getpodcasts", &routes.GetPodcastsHandler{UserDB: userDB, PodcastDB: podcastDB, JwtTokenUtil: jwtTokenUtil})
 	http.Handle("/getepisodes", &routes.GetEpisodesHandler{UserDB: userDB, EpisodeDB: episodeDB})
+	http.Handle("createpodcast", &routes.CreatePodcastHandler{PodcastDB: podcastDB, JwtTokenUtil: jwtTokenUtil, FileHelper: fileHelperutil})
 	http.Handle("/upload", &routes.UploadEpisodeHandler{UserDB: userDB, EpisodeDB: episodeDB, JwtTokenUtil: jwtTokenUtil})
 
 	http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", nil)
