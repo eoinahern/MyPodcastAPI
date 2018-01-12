@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"my_podcast_api/models"
 	"my_podcast_api/repository"
 	"my_podcast_api/util"
@@ -189,7 +190,6 @@ func (c *CreatePodcastHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 		if err != nil {
 			http.Error(w, http.StatusText(51), http.StatusInternalServerError)
 			return
-
 		}
 
 		token := getTokenFromHeader(req)
@@ -201,26 +201,30 @@ func (c *CreatePodcastHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 			return
 		}
 
-		//navigate to use dir!!!
-
-		podcastname := req.URL.Query().Get("name")
+		podcastname := req.URL.Query().Get("podcastname")
+		log.Println(podcastname)
+		fmt.Println(podcastname)
 
 		if len(podcastname) == 0 {
 			http.Error(w, http.StatusText(22), http.StatusBadRequest)
 			return
 		}
 
-		path := fmt.Sprintf("%s/%s/%s", podcastFiles, "myname", podcastname)
+		path := fmt.Sprintf("%s/%s/%s", podcastFiles, podcast.UserEmail, podcastname)
 		fmt.Println(path)
 
 		if !c.FileHelper.CheckDirFileExists(path) {
 			c.FileHelper.CreateDir(path)
 			podcast.Location = path
+			podcast.Name = podcastname
 			err = c.PodcastDB.CreatePodcast(podcast)
 
 			if err != nil {
 				http.Error(w, http.StatusText(51), http.StatusInternalServerError)
 			}
+
+			mpod, _ := json.Marshal(podcast)
+			w.Write(mpod)
 
 		} else {
 			http.Error(w, http.StatusText(31), http.StatusConflict)
