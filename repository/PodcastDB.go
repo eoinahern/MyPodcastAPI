@@ -54,9 +54,13 @@ func (DB *PodcastDB) UpdatePodcast(podcast models.Podcast) bool {
 	return true
 }
 
-func (DB *PodcastDB) CreatePodcast(podcast models.Podcast) {
+func (DB *PodcastDB) CreatePodcast(podcast models.Podcast) error {
 
-	if err := DB.Save(podcast).Error; err != nil {
+	err := DB.Save(podcast).Error
+
+	if err != nil {
 		log.Println(err)
 	}
+
+	return err
 }

@@ -183,6 +183,15 @@ func (c *CreatePodcastHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 
 		w.Header().Set("Content-Type", "application/json")
 
+		var podcast models.Podcast
+		err := json.NewDecoder(req.Body).Decode(&podcast)
+
+		if err != nil {
+			http.Error(w, http.StatusText(51), http.StatusInternalServerError)
+			return
+
+		}
+
 		token := getTokenFromHeader(req)
 		code, _ := c.JwtTokenUtil.CheckTokenCredentials(token)
 
@@ -206,11 +215,12 @@ func (c *CreatePodcastHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 
 		if !c.FileHelper.CheckDirFileExists(path) {
 			c.FileHelper.CreateDir(path)
-			pod := models.Podcast{}
-			pod.Location = path
-			c.PodcastDB.CreatePodcast(pod)
+			podcast.Location = path
+			err = c.PodcastDB.CreatePodcast(podcast)
 
-			//check error?. if worked return podcast obj else return StatusInternalServerError
+			if err != nil {
+				http.Error(w, http.StatusText(51), http.StatusInternalServerError)
+			}
 
 		} else {
 			http.Error(w, http.StatusText(31), http.StatusConflict)
