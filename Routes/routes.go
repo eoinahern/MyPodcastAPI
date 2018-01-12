@@ -64,8 +64,16 @@ type DeleteEpisodeHandler struct {
 	PodcastDB *repository.PodcastDB
 }
 
+//vars
 var tokenErr []byte = []byte(`{ "error" : "problem with token"}`)
 var internalErr []byte = []byte(`{ "error" : "internal error"}`)
+
+const notAllowedErrStr string = "method not allowed"
+
+/**
+*	helper to get auth token
+*
+**/
 
 func getTokenFromHeader(req *http.Request) string {
 
@@ -77,13 +85,12 @@ func getTokenFromHeader(req *http.Request) string {
 	}
 
 	return tokenSlice[1]
-
 }
 
 func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	if req.Method != http.MethodPost {
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		http.Error(w, notAllowedErrStr, http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -133,20 +140,19 @@ func (c *CreateSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 		}
 
 		dbUser := c.DB.GetUser(user.UserName)
+		w.Header().Set("Content-Type", "application/json")
 
 		if c.PassEncryptUtil.CheckSame(dbUser.Password, user.Password) {
 			user.Token = c.JwtTokenUtil.CreateToken(user.UserName)
 			jsonUser, _ := json.Marshal(user)
-			w.Header().Set("Content-Type", "application/json")
 			w.Write(jsonUser)
 		} else {
-			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(`{"error" : "incorrect pass"}`))
 		}
 
 	} else {
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		http.Error(w, notAllowedErrStr, http.StatusMethodNotAllowed)
 	}
 
 }
@@ -156,7 +162,7 @@ func (e *EndSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) 
 		io.WriteString(w, "session ended!!!")
 
 	} else {
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		http.Error(w, notAllowedErrStr, http.StatusMethodNotAllowed)
 	}
 
 }
@@ -184,8 +190,7 @@ func (c *CreatePodcastHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 		}
 
 	} else {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		w.Write(tokenErr)
+		http.Error(w, notAllowedErrStr, http.StatusMethodNotAllowed)
 	}
 
 }

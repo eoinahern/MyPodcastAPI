@@ -4,6 +4,14 @@ type FileHelperUtil struct {
 	file []byte
 }
 
+func createDIR() {
+
+}
+
+func checkDirFileExists(path string) bool {
+	return false
+}
+
 func (f *FileHelperUtil) checkExtension() {
 
 }
