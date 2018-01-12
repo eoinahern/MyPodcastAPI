@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"my_podcast_api/models"
 	"my_podcast_api/repository"
@@ -70,6 +71,7 @@ var tokenErr []byte = []byte(`{ "error" : "problem with token"}`)
 var internalErr []byte = []byte(`{ "error" : "internal error"}`)
 
 const notAllowedErrStr string = "method not allowed"
+const podcastFiles string = "../files"
 
 /**
 *	helper to get auth token
@@ -199,8 +201,11 @@ func (c *CreatePodcastHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 			return
 		}
 
-		if !c.FileHelper.CheckDirFileExists(podcastname) {
-			c.FileHelper.CreateDir()
+		path := fmt.Sprintf("%s/%s/%s", podcastFiles, "myname", podcastname)
+		fmt.Println(path)
+
+		if !c.FileHelper.CheckDirFileExists(path) {
+			c.FileHelper.CreateDir(path)
 		}
 
 		//add data to DB return success
