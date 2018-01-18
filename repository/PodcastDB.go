@@ -6,6 +6,7 @@ import (
 	"my_podcast_api/models"
 
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 type PodcastDB struct {
@@ -38,16 +39,12 @@ func (DB *PodcastDB) GetPodcast(userName string, podcastName string) *models.Pod
 	return &podcast
 }
 
-func (DB *PodcastDB) CheckPodcastUserName(userName string, podcastName string) bool {
+func (DB *PodcastDB) CheckPodcastCreated(userName string) models.Podcast {
 
 	var podcast models.Podcast
-	DB.Where("user_email = ? AND name = ? ", userName, podcastName).First(&podcast)
+	DB.Where("user_email = ?", userName).First(&podcast)
 
-	if len(podcast.Name) == 0 {
-		return true
-	} else {
-		return false
-	}
+	return podcast
 
 }
 

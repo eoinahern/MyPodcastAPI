@@ -1,8 +1,6 @@
 package models
 
 import (
-	"os"
-
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
@@ -51,11 +49,11 @@ type SecurePodcast struct {
 }
 
 type Episode struct {
-	PodID     uint    `gorm:"type:INTEGER" json:"podid"`
-	Created   string  `json:"created" gorm:"type: TEXT"`
-	Updated   string  `json:"updated" gorm:"type: TEXT"`
-	URL       string  `json:"url" gorm:"type: TEXT"`
-	Downloads int32   `json:"downloads" gorm:"type:INTEGER; not null default:0"`
-	Blurb     string  `json:"blurb" gorm:"type: TEXT"`
-	Data      os.File `json:"data" gorm:"-"`
+	PodID     uint   `gorm:"type:INTEGER" json:"podid"`
+	Created   string `json:"created" gorm:"type: TEXT"`
+	Updated   string `json:"updated" gorm:"type: TEXT"`
+	URL       string `json:"url" gorm:"type: TEXT"`
+	Downloads int32  `json:"downloads" gorm:"type:INTEGER; not null default:0"`
+	Blurb     string `json:"blurb" gorm:"type: TEXT"`
+	//Data      os.File `json:"data" gorm:"-"`
 }

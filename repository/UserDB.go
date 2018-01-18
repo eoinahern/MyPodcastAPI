@@ -5,6 +5,7 @@ import (
 	"my_podcast_api/models"
 
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 type UserDB struct {
