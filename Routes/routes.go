@@ -211,7 +211,6 @@ func (c *CreatePodcastHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 
 		if !c.FileHelper.CheckDirFileExists(path) {
 			c.FileHelper.CreateDir(path)
-			fmt.Println(path)
 			podcast.Location = path
 			podcast.Name = podcastname
 			err = c.PodcastDB.CreatePodcast(podcast)
@@ -279,18 +278,16 @@ func (e *GetEpisodesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 
 func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
-	//need to pass podcast obj with slice of episodes
-
 	//1.need header authorisation. check legit?
 	//2.if so add files info to database.
 	//3.then upload file to folder. username/podcastname/files.extension
 
-	//decode obj sent
-	decoder := json.NewDecoder(req.Body)
-	var podcast models.Podcast
-	err := decoder.Decode(&podcast)
+	var episode models.Episode
+	_, fh, fileErr := req.FormFile("namefile")
+	sepisode := req.FormValue("data")
+	err := json.Unmarshal([]byte(sepisode), &episode)
 
-	if err != nil {
+	if len(sepisode) == 0 || err != nil || fileErr != nil {
 		http.Error(w, "error", http.StatusInternalServerError)
 		return
 	}

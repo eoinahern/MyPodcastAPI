@@ -58,5 +58,6 @@ func main() {
 	http.Handle("/createpodcast", &routes.CreatePodcastHandler{PodcastDB: podcastDB, JwtTokenUtil: jwtTokenUtil, FileHelper: fileHelperUtil})
 	http.Handle("/upload", &routes.UploadEpisodeHandler{UserDB: userDB, EpisodeDB: episodeDB, JwtTokenUtil: jwtTokenUtil})
 
-	http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", nil)
+	http.ListenAndServe(":8080", nil)
+	//http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", nil)
 }
