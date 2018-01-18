@@ -39,10 +39,10 @@ func (DB *PodcastDB) GetPodcast(userName string, podcastName string) *models.Pod
 	return &podcast
 }
 
-func (DB *PodcastDB) CheckPodcastCreated(userName string) models.Podcast {
+func (DB *PodcastDB) CheckPodcastCreated(podcastID uint, podcastName string) models.Podcast {
 
 	var podcast models.Podcast
-	DB.Where("user_email = ?", userName).First(&podcast)
+	DB.Where("name = ? AND  podcast_id = ?", podcastName, podcastID).First(&podcast)
 
 	return podcast
 

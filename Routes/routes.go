@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"my_podcast_api/models"
 	"my_podcast_api/repository"
 	"my_podcast_api/util"
 	"my_podcast_api/validation"
 	"net/http"
+	"os"
 	"reflect"
 	"strings"
 )
@@ -284,19 +286,20 @@ func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 	//3.then upload file to folder. username/podcastname/files.extension
 
 	var episode models.Episode
-	//file, fh, fileErr := req.FormFile("namefile")
+	file, fh, fileErr := req.FormFile("namefile")
 	sepisode := req.FormValue("data")
-	json.Unmarshal([]byte(sepisode), &episode)
+	podcastname := req.URL.Query().Get("podcast")
+	err := json.Unmarshal([]byte(sepisode), &episode)
 
 	fmt.Println("blurb " + episode.Blurb)
 	fmt.Println("podid " + fmt.Sprintf("%d", episode.PodID))
 	fmt.Println("created " + episode.Created)
 	fmt.Println("podid type " + reflect.TypeOf(episode.PodID).String())
 
-	/*if len(sepisode) == 0 || err != nil || fileErr != nil {
+	if len(sepisode) == 0 || err != nil || fileErr != nil {
 		http.Error(w, "error", http.StatusInternalServerError)
 		return
-	}*/
+	}
 
 	//token := getTokenFromHeader(req)
 	//name := req.URL.Query().Get("pod")
@@ -315,16 +318,15 @@ func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 	//3. hash file name. read file and save in directory.
 	//4. add file details to DB. return 200 ok
 
-	pod := e.PodcastDB.CheckPodcastCreated("eoin@yahoo.co.uk")
+	podcast := e.PodcastDB.CheckPodcastCreated(episode.PodID, podcastname)
 
-	fmt.Println(" loc " + pod.Location)
-	fmt.Println("pod name " + pod.Name)
+	fmt.Println(" loc " + podcast.Location)
+	fmt.Println("pod name " + podcast.Name)
 
-	/*if len(podcast.Name) == 0 {
+	if len(podcast.Name) == 0 {
 		http.Error(w, "unknown podcast", http.StatusInternalServerError)
 		return
 	}
-
 
 	splitname := strings.Split(fh.Filename, ".")
 	ext := splitname[len(splitname)-1]
@@ -342,7 +344,7 @@ func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 
 	}
 
-	ioutil.WriteFile(fmt.Sprintf("%s/%s.%s", podcast.Location, podcast.PodcastID, "mp3"), fileBytes, os.ModePerm)*/
+	ioutil.WriteFile(fmt.Sprintf("%s/%d.%s", podcast.Location, podcast.PodcastID, "mp3"), fileBytes, os.ModePerm)
 
 	//update episode num in podcasts table
 	//save to database return episode data
