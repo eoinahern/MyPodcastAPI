@@ -51,8 +51,8 @@ type GetEpisodesHandler struct {
 }
 
 type DownloadEpisodeHandler struct {
-	//need folder location!! key and credentials.
-	//transmit file across network
+	JwtTokenUtil *util.JwtTokenUtil
+	EpisodeDB    *respository.EpisodeDB
 }
 
 type UploadEpisodeHandler struct {
@@ -237,9 +237,6 @@ func (c *CreatePodcastHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 
 func (g *GetPodcastsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
-	//1. authorize user...
-	//2. if authenticated. return most popular podcasts based on num downloads
-
 	if req.Method == http.MethodGet {
 
 		token := getTokenFromHeader(req)
@@ -293,17 +290,15 @@ func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 			return
 		}
 
-		//token := getTokenFromHeader(req)
-		//name := req.URL.Query().Get("pod")
-
-		/*code, message := e.JwtTokenUtil.CheckTokenCredentials(token)
+		token := getTokenFromHeader(req)
+		code, message := e.JwtTokenUtil.CheckTokenCredentials(token)
 
 		if code != -1 {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(code)
 			msg, _ := json.Marshal(models.Message{Message: message})
 			w.Write(msg)
-		}*/
+		}
 
 		podcast := e.PodcastDB.CheckPodcastCreated(episode.PodID, podcastname)
 
@@ -334,5 +329,8 @@ func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 		ioutil.WriteFile(fmt.Sprintf(filelocation), fileBytes, os.ModePerm)
 		e.PodcastDB.UpdatePodcastNumEpisodes(podcast.PodcastID)
 
+	} else {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Write([]byte(`{ "error" : "not allowed"}`))
 	}
 }
