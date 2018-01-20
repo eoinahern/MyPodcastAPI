@@ -48,8 +48,17 @@ func (DB *PodcastDB) CheckPodcastCreated(podcastID uint, podcastName string) mod
 
 }
 
-func (DB *PodcastDB) UpdatePodcast(podcast models.Podcast) bool {
-	return true
+func (DB *PodcastDB) UpdatePodcast(id uint) {
+
+	var podcast models.Podcast
+	DB.Where("podcast_id = ?", id).First(&podcast)
+	podcast.EpisodeNum += 1
+	db := DB.Save(&podcast)
+
+	if db.Error != nil {
+		log.Println(db.Error)
+	}
+
 }
 
 func (DB *PodcastDB) CreatePodcast(podcast models.Podcast) error {

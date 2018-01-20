@@ -29,7 +29,7 @@ type Message struct {
 }
 
 type Podcast struct {
-	PodcastID  int       `gorm:"primary_key"  json:"podcastid"`
+	PodcastID  uint      `gorm:"primary_key"  json:"podcastid"`
 	UserEmail  string    `json:"useremail" gorm:"type:VARCHAR(80)"`
 	Icon       string    `json:"icon"   gorm:"type:TEXT"`
 	Name       string    `json:"name" gorm:"type: TEXT"`
@@ -49,11 +49,11 @@ type SecurePodcast struct {
 }
 
 type Episode struct {
+	EpisodeID uint   `json:"episodeid" gorm:"primary_key"`
 	PodID     uint   `gorm:"type:INTEGER" json:"podid"`
 	Created   string `json:"created" gorm:"type: TEXT"`
 	Updated   string `json:"updated" gorm:"type: TEXT"`
 	URL       string `json:"url" gorm:"type: TEXT"`
 	Downloads int32  `json:"downloads" gorm:"type:INTEGER; not null default:0"`
 	Blurb     string `json:"blurb" gorm:"type: TEXT"`
-	//Data      os.File `json:"data" gorm:"-"`
 }

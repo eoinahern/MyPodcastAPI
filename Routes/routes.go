@@ -11,7 +11,6 @@ import (
 	"my_podcast_api/validation"
 	"net/http"
 	"os"
-	"reflect"
 	"strings"
 )
 
@@ -291,11 +290,6 @@ func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 	podcastname := req.URL.Query().Get("podcast")
 	err := json.Unmarshal([]byte(sepisode), &episode)
 
-	fmt.Println("blurb " + episode.Blurb)
-	fmt.Println("podid " + fmt.Sprintf("%d", episode.PodID))
-	fmt.Println("created " + episode.Created)
-	fmt.Println("podid type " + reflect.TypeOf(episode.PodID).String())
-
 	if len(sepisode) == 0 || err != nil || fileErr != nil {
 		http.Error(w, "error", http.StatusInternalServerError)
 		return
@@ -320,9 +314,6 @@ func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 
 	podcast := e.PodcastDB.CheckPodcastCreated(episode.PodID, podcastname)
 
-	fmt.Println(" loc " + podcast.Location)
-	fmt.Println("pod name " + podcast.Name)
-
 	if len(podcast.Name) == 0 {
 		http.Error(w, "unknown podcast", http.StatusInternalServerError)
 		return
@@ -341,10 +332,12 @@ func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 	if err != nil {
 		http.Error(w, "error", http.StatusInternalServerError)
 		return
-
 	}
 
-	ioutil.WriteFile(fmt.Sprintf("%s/%d.%s", podcast.Location, podcast.PodcastID, "mp3"), fileBytes, os.ModePerm)
+	e.EpisodeDB.AddEpisode(episode)
+	episode = e.EpisodeDB.GetLastEpisode()
+	ioutil.WriteFile(fmt.Sprintf("%s/%d.%s", podcast.Location, episode.EpisodeID, "mp3"), fileBytes, os.ModePerm)
+	e.PodcastDB.UpdatePodcast(podcast.PodcastID)
 
 	//update episode num in podcasts table
 	//save to database return episode data
