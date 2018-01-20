@@ -209,7 +209,7 @@ func (c *CreatePodcastHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 			return
 		}
 
-		path := fmt.Sprintf("%s/%s/%s", podcastFiles, podcast.UserEmail, podcastname)
+		path := fmt.Sprintf("%s/%d/%s", podcastFiles, podcast.PodcastID, podcastname)
 
 		if !c.FileHelper.CheckDirFileExists(path) {
 			c.FileHelper.CreateDir(path)
