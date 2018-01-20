@@ -280,68 +280,59 @@ func (e *GetEpisodesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 
 func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
-	//1.need header authorisation. check legit?
-	//2.if so add files info to database.
-	//3.then upload file to folder. username/podcastname/files.extension
+	if req.Method == http.MethodPost {
 
-	var episode models.Episode
-	file, fh, fileErr := req.FormFile("namefile")
-	sepisode := req.FormValue("data")
-	podcastname := req.URL.Query().Get("podcast")
-	err := json.Unmarshal([]byte(sepisode), &episode)
+		var episode models.Episode
+		file, fh, fileErr := req.FormFile("namefile")
+		sepisode := req.FormValue("data")
+		podcastname := req.URL.Query().Get("podcast")
+		err := json.Unmarshal([]byte(sepisode), &episode)
 
-	if len(sepisode) == 0 || err != nil || fileErr != nil {
-		http.Error(w, "error", http.StatusInternalServerError)
-		return
+		if len(sepisode) == 0 || err != nil || fileErr != nil {
+			http.Error(w, "error", http.StatusInternalServerError)
+			return
+		}
+
+		//token := getTokenFromHeader(req)
+		//name := req.URL.Query().Get("pod")
+
+		/*code, message := e.JwtTokenUtil.CheckTokenCredentials(token)
+
+		if code != -1 {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(code)
+			msg, _ := json.Marshal(models.Message{Message: message})
+			w.Write(msg)
+		}*/
+
+		podcast := e.PodcastDB.CheckPodcastCreated(episode.PodID, podcastname)
+
+		if len(podcast.Name) == 0 {
+			http.Error(w, "unknown podcast", http.StatusInternalServerError)
+			return
+		}
+
+		splitname := strings.Split(fh.Filename, ".")
+		ext := splitname[len(splitname)-1]
+
+		if strings.Compare(ext, "mp3") != 0 {
+			http.Error(w, "wrong file type", http.StatusInternalServerError)
+			return
+		}
+
+		fileBytes, err := ioutil.ReadAll(file)
+
+		if err != nil {
+			http.Error(w, "error", http.StatusInternalServerError)
+			return
+		}
+
+		lastepisode := e.EpisodeDB.GetLastEpisode()
+		filelocation := fmt.Sprintf("%s/%d.%s", podcast.Location, lastepisode.EpisodeID+1, "mp3")
+		episode.URL = filelocation
+		e.EpisodeDB.AddEpisode(episode)
+		ioutil.WriteFile(fmt.Sprintf(filelocation), fileBytes, os.ModePerm)
+		e.PodcastDB.UpdatePodcastNumEpisodes(podcast.PodcastID)
+
 	}
-
-	//token := getTokenFromHeader(req)
-	//name := req.URL.Query().Get("pod")
-
-	/*code, message := e.JwtTokenUtil.CheckTokenCredentials(token)
-
-	if code != -1 {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(code)
-		msg, _ := json.Marshal(models.Message{Message: message})
-		w.Write(msg)
-	}*/
-
-	//1. check podcast name? if it doesnt exist create? file extension check?
-	//2. check podcast number from podcasts table. increment count by 1.
-	//3. hash file name. read file and save in directory.
-	//4. add file details to DB. return 200 ok
-
-	podcast := e.PodcastDB.CheckPodcastCreated(episode.PodID, podcastname)
-
-	if len(podcast.Name) == 0 {
-		http.Error(w, "unknown podcast", http.StatusInternalServerError)
-		return
-	}
-
-	splitname := strings.Split(fh.Filename, ".")
-	ext := splitname[len(splitname)-1]
-
-	if strings.Compare(ext, "mp3") != 0 {
-		http.Error(w, "wrong file type", http.StatusInternalServerError)
-		return
-	}
-
-	fileBytes, err := ioutil.ReadAll(file)
-
-	if err != nil {
-		http.Error(w, "error", http.StatusInternalServerError)
-		return
-	}
-
-	filelocation := fmt.Sprintf("%s/%d.%s", podcast.Location, episode.EpisodeID, "mp3")
-	episode.URL = filelocation
-	e.EpisodeDB.AddEpisode(episode)
-	episode = e.EpisodeDB.GetLastEpisode()
-	ioutil.WriteFile(fmt.Sprintf(filelocation), fileBytes, os.ModePerm)
-	e.PodcastDB.UpdatePodcastNumEpisodes(podcast.PodcastID)
-
-	//update episode num in podcasts table
-	//save to database return episode data
-
 }
