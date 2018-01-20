@@ -48,7 +48,7 @@ func (DB *PodcastDB) CheckPodcastCreated(podcastID uint, podcastName string) mod
 
 }
 
-func (DB *PodcastDB) UpdatePodcast(id uint) {
+func (DB *PodcastDB) UpdatePodcastNumEpisodes(id uint) {
 
 	var podcast models.Podcast
 	DB.Where("podcast_id = ?", id).First(&podcast)
