@@ -16,7 +16,7 @@ func getEpisode(email string, name string, ref string) *models.Episode {
 	return nil
 }
 
-func getAllEpisodes(email string, podcastname string) []models.Episode {
+func (DB *EpisodeDB) GetAllEpisodes(podcastid int) []models.Episode {
 	return []models.Episode{}
 }
 

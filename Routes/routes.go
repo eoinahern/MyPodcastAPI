@@ -11,6 +11,7 @@ import (
 	"my_podcast_api/validation"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -47,8 +48,9 @@ type GetPodcastsHandler struct {
 
 //all episodes associated with specific podcast
 type GetEpisodesHandler struct {
-	UserDB    *repository.UserDB
-	EpisodeDB *repository.EpisodeDB
+	UserDB       *repository.UserDB
+	EpisodeDB    *repository.EpisodeDB
+	JwtTokenUtil *util.JwtTokenUtil
 }
 
 //a specific episode
@@ -273,7 +275,31 @@ func (g *GetPodcastsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 * by podcast id and name!!!
 **/
 
-func (e *GetEpisodesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (g *GetEpisodesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+
+	if req.Method == http.MethodGet {
+
+		token := getTokenFromHeader(req)
+		status, errTxt := g.JwtTokenUtil.CheckTokenCredentials(token)
+
+		if status != -1 {
+			http.Error(w, errTxt, status)
+			return
+		}
+
+		podcastid, err := strconv.Atoi(req.URL.Query().Get("podcastid"))
+
+		if err != nil {
+			http.Error(w, http.StatusText(22), http.StatusBadRequest)
+			return
+		}
+
+		episodes := g.EpisodeDB.GetAllEpisodes(podcastid)
+		json.NewEncoder(w).Encode(episodes)
+
+	} else {
+		http.Error(w, notAllowedErrStr, http.StatusMethodNotAllowed)
+	}
 
 }
 
