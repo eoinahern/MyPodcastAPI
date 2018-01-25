@@ -17,7 +17,10 @@ func getEpisode(email string, name string, ref string) *models.Episode {
 }
 
 func (DB *EpisodeDB) GetAllEpisodes(podcastid int) []models.Episode {
-	return []models.Episode{}
+
+	var episodes []models.Episode
+	DB.Where("pod_id = ?", podcastid).Find(&episodes)
+	return episodes
 }
 
 func (DB *EpisodeDB) AddEpisode(episode models.Episode) error {

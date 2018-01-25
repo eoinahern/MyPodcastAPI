@@ -295,7 +295,7 @@ func (g *GetEpisodesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 		}
 
 		episodes := g.EpisodeDB.GetAllEpisodes(podcastid)
-		json.NewEncoder(w).Encode(episodes)
+		json.NewEncoder(w).Encode(&episodes)
 
 	} else {
 		http.Error(w, notAllowedErrStr, http.StatusMethodNotAllowed)
