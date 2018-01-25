@@ -272,7 +272,7 @@ func (g *GetPodcastsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 
 /**
 *	get episodes from a specific podcast
-* by podcast id and name!!!
+* by podcast id!!!
 **/
 
 func (g *GetEpisodesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -295,6 +295,7 @@ func (g *GetEpisodesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 		}
 
 		episodes := g.EpisodeDB.GetAllEpisodes(podcastid)
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(&episodes)
 
 	} else {
