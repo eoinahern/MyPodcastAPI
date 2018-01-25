@@ -45,14 +45,16 @@ type GetPodcastsHandler struct {
 	JwtTokenUtil *util.JwtTokenUtil
 }
 
+//all episodes associated with specific podcast
 type GetEpisodesHandler struct {
 	UserDB    *repository.UserDB
 	EpisodeDB *repository.EpisodeDB
 }
 
+//a specific episode
 type DownloadEpisodeHandler struct {
 	JwtTokenUtil *util.JwtTokenUtil
-	EpisodeDB    *respository.EpisodeDB
+	EpisodeDB    *repository.EpisodeDB
 }
 
 type UploadEpisodeHandler struct {

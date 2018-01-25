@@ -50,7 +50,7 @@ type SecurePodcast struct {
 
 type Episode struct {
 	EpisodeID uint   `json:"episodeid" gorm:"primary_key"`
-	PodID     uint   `gorm:"type:INTEGER" json:"podid"`
+	PodID     uint   `json:"podid"`
 	Created   string `json:"created" gorm:"type: TEXT"`
 	Updated   string `json:"updated" gorm:"type: TEXT"`
 	URL       string `json:"url" gorm:"type: TEXT"`
