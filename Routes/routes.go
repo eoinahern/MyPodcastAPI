@@ -53,7 +53,7 @@ type GetEpisodesHandler struct {
 	JwtTokenUtil *util.JwtTokenUtil
 }
 
-//a specific episode
+//a specific episode data
 type DownloadEpisodeHandler struct {
 	JwtTokenUtil *util.JwtTokenUtil
 	EpisodeDB    *repository.EpisodeDB
@@ -176,7 +176,7 @@ func (e *EndSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) 
 
 }
 
-//create a podcast enntry and folder on server.
+//create a podcast entry and folder on server.
 
 func (c *CreatePodcastHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
@@ -301,6 +301,10 @@ func (g *GetEpisodesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 	} else {
 		http.Error(w, notAllowedErrStr, http.StatusMethodNotAllowed)
 	}
+
+}
+
+func (g *DownloadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 }
 

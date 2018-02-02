@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
@@ -51,13 +52,16 @@ func main() {
 
 	defer db.Close()
 
-	http.Handle("/register", &routes.RegisterHandler{EmailValidator: emailValidator, DB: userDB, PassEncryptUtil: passEncryptUtil})
-	http.Handle("/createsession", &routes.CreateSessionHandler{DB: userDB, JwtTokenUtil: jwtTokenUtil, PassEncryptUtil: passEncryptUtil})
-	http.Handle("/getpodcasts", &routes.GetPodcastsHandler{UserDB: userDB, PodcastDB: podcastDB, JwtTokenUtil: jwtTokenUtil})
-	http.Handle("/getepisodes", &routes.GetEpisodesHandler{UserDB: userDB, EpisodeDB: episodeDB, JwtTokenUtil: jwtTokenUtil})
-	http.Handle("/createpodcast", &routes.CreatePodcastHandler{PodcastDB: podcastDB, JwtTokenUtil: jwtTokenUtil, FileHelper: fileHelperUtil})
-	http.Handle("/upload", &routes.UploadEpisodeHandler{UserDB: userDB, PodcastDB: podcastDB, EpisodeDB: episodeDB, JwtTokenUtil: jwtTokenUtil})
+	router := mux.NewRouter()
 
-	http.ListenAndServe(":8080", nil)
+	router.Handle("/register", &routes.RegisterHandler{EmailValidator: emailValidator, DB: userDB, PassEncryptUtil: passEncryptUtil})
+	router.Handle("/createsession", &routes.CreateSessionHandler{DB: userDB, JwtTokenUtil: jwtTokenUtil, PassEncryptUtil: passEncryptUtil})
+	router.Handle("/getpodcasts", &routes.GetPodcastsHandler{UserDB: userDB, PodcastDB: podcastDB, JwtTokenUtil: jwtTokenUtil})
+	router.Handle("/getepisodes", &routes.GetEpisodesHandler{UserDB: userDB, EpisodeDB: episodeDB, JwtTokenUtil: jwtTokenUtil})
+	router.Handle("/download/{podcastid}/{podcastname}/{podcastfilename}", &routes.DownloadEpisodeHandler{JwtTokenUtil: jwtTokenUtil, EpisodeDB: episodeDB})
+	router.Handle("/createpodcast", &routes.CreatePodcastHandler{PodcastDB: podcastDB, JwtTokenUtil: jwtTokenUtil, FileHelper: fileHelperUtil})
+	router.Handle("/upload", &routes.UploadEpisodeHandler{UserDB: userDB, PodcastDB: podcastDB, EpisodeDB: episodeDB, JwtTokenUtil: jwtTokenUtil})
+
+	http.ListenAndServe(":8080", router)
 	//http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", nil)
 }
