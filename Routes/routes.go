@@ -329,7 +329,7 @@ func (g *DownloadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Requ
 	}
 
 	w.Header().Set("Content-Type", "audio/mpeg")
-	json.NewEncoder(w).Encode(&filedata)
+	w.Write(filedata)
 
 }
 
