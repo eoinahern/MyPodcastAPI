@@ -58,7 +58,7 @@ func main() {
 	router.Handle("/createsession", &routes.CreateSessionHandler{DB: userDB, JwtTokenUtil: jwtTokenUtil, PassEncryptUtil: passEncryptUtil})
 	router.Handle("/getpodcasts", &routes.GetPodcastsHandler{UserDB: userDB, PodcastDB: podcastDB, JwtTokenUtil: jwtTokenUtil})
 	router.Handle("/getepisodes", &routes.GetEpisodesHandler{UserDB: userDB, EpisodeDB: episodeDB, JwtTokenUtil: jwtTokenUtil})
-	router.Handle("/download/{podcastid}/{podcastname}/{podcastfilename}", &routes.DownloadEpisodeHandler{JwtTokenUtil: jwtTokenUtil, EpisodeDB: episodeDB})
+	router.Handle("/download/{podcastid}/{podcastname}/{podcastfilename}", &routes.DownloadEpisodeHandler{JwtTokenUtil: jwtTokenUtil, EpisodeDB: episodeDB}).Methods(http.MethodGet)
 	router.Handle("/createpodcast", &routes.CreatePodcastHandler{PodcastDB: podcastDB, JwtTokenUtil: jwtTokenUtil, FileHelper: fileHelperUtil})
 	router.Handle("/upload", &routes.UploadEpisodeHandler{UserDB: userDB, PodcastDB: podcastDB, EpisodeDB: episodeDB, JwtTokenUtil: jwtTokenUtil})
 

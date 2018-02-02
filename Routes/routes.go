@@ -13,6 +13,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 //tregister user!!!
@@ -306,6 +308,30 @@ func (g *GetEpisodesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 
 func (g *DownloadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
+	requestParams := mux.Vars(req)
+
+	//{podcastid}/{podcastname}/{podcastfilename}
+
+	podcastID := requestParams["podcastid"]
+	podcastName := requestParams["podcastname"]
+	podcastFileName := requestParams["podcastfilename"]
+
+	if len(podcastID) == 0 || len(podcastName) == 0 || len(podcastFileName) == 0 {
+		http.Error(w, "unrecognised", http.StatusBadRequest)
+		return
+	}
+
+	podlocation := fmt.Sprintf("%s/%d/%s/%s", podcastFiles, podcastID, podcastName, podcastFileName)
+	filedata, err := ioutil.ReadFile(podlocation)
+
+	if err != nil {
+		http.Error(w, "not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "audio/mpeg")
+	json.NewEncoder(w).Encode(filedata)
+
 }
 
 func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -359,7 +385,7 @@ func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 		filelocation := fmt.Sprintf("%s/%d.%s", podcast.Location, lastepisode.EpisodeID+1, "mp3")
 		episode.URL = filelocation
 		e.EpisodeDB.AddEpisode(episode)
-		ioutil.WriteFile(fmt.Sprintf(filelocation), fileBytes, os.ModePerm)
+		ioutil.WriteFile(filelocation, fileBytes, os.ModePerm)
 		e.PodcastDB.UpdatePodcastNumEpisodes(podcast.PodcastID)
 
 	} else {
