@@ -310,8 +310,6 @@ func (g *DownloadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Requ
 
 	requestParams := mux.Vars(req)
 
-	//{podcastid}/{podcastname}/{podcastfilename}
-
 	podcastID := requestParams["podcastid"]
 	podcastName := requestParams["podcastname"]
 	podcastFileName := requestParams["podcastfilename"]
@@ -321,7 +319,8 @@ func (g *DownloadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Requ
 		return
 	}
 
-	podlocation := fmt.Sprintf("%s/%d/%s/%s", podcastFiles, podcastID, podcastName, podcastFileName)
+	podlocation := fmt.Sprintf("%s/%s/%s/%s", podcastFiles, podcastID, podcastName, podcastFileName)
+	fmt.Println(podlocation)
 	filedata, err := ioutil.ReadFile(podlocation)
 
 	if err != nil {
@@ -330,7 +329,7 @@ func (g *DownloadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Requ
 	}
 
 	w.Header().Set("Content-Type", "audio/mpeg")
-	json.NewEncoder(w).Encode(filedata)
+	json.NewEncoder(w).Encode(&filedata)
 
 }
 
