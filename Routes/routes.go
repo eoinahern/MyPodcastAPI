@@ -76,23 +76,6 @@ var internalErr []byte = []byte(`{ "error" : "internal error"}`)
 const notAllowedErrStr string = "method not allowed"
 const podcastFiles string = "./files"
 
-/**
-*	helper to get auth token
-*
-**/
-
-func getTokenFromHeader(req *http.Request) string {
-
-	token := req.Header.Get("Authorization")
-	tokenSlice := strings.Split(token, " ")
-
-	if len(tokenSlice) != 2 {
-		return ""
-	}
-
-	return tokenSlice[1]
-}
-
 func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	if req.Method != http.MethodPost {
@@ -315,5 +298,4 @@ func (e *UploadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 	e.EpisodeDB.AddEpisode(episode)
 	ioutil.WriteFile(filelocation, fileBytes, os.ModePerm)
 	e.PodcastDB.UpdatePodcastNumEpisodes(podcast.PodcastID)
-
 }
