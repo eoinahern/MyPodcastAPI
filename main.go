@@ -59,7 +59,7 @@ func main() {
 	router.Handle("/createsession", &routes.CreateSessionHandler{DB: userDB, JwtTokenUtil: jwtTokenUtil, PassEncryptUtil: passEncryptUtil})
 	router.Handle("/getpodcasts", &routes.GetPodcastsHandler{UserDB: userDB, PodcastDB: podcastDB, JwtTokenUtil: jwtTokenUtil})
 	router.Handle("/getepisodes", &routes.GetEpisodesHandler{UserDB: userDB, EpisodeDB: episodeDB, JwtTokenUtil: jwtTokenUtil})
-	router.Handle("/download/{podcastid}/{podcastname}/{podcastfilename}", &middleware.Authorization{JwtTokenUtil: jwtTokenUtil, Next: &routes.DownloadEpisodeHandler{EpisodeDB: episodeDB}}).Methods(http.MethodGet)
+	router.Handle("/download/{podcastid}/{podcastname}/{podcastfilename}", middleware.Adapt(&routes.DownloadEpisodeHandler{EpisodeDB: episodeDB}, middleware.StringMiddlewareInit("hello there"), middleware.AuthMiddlewareInit(jwtTokenUtil))).Methods(http.MethodGet) //&middleware.Authorization{JwtTokenUtil: jwtTokenUtil, Next: &routes.DownloadEpisodeHandler{EpisodeDB: episodeDB}}).Methods(http.MethodGet)
 	router.Handle("/createpodcast", &middleware.Authorization{JwtTokenUtil: jwtTokenUtil, Next: &routes.CreatePodcastHandler{PodcastDB: podcastDB, FileHelper: fileHelperUtil}}).Methods(http.MethodPost)
 	router.Handle("/upload", &middleware.Authorization{JwtTokenUtil: jwtTokenUtil, Next: &routes.UploadEpisodeHandler{UserDB: userDB, PodcastDB: podcastDB, EpisodeDB: episodeDB}}).Methods(http.MethodPost)
 
