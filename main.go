@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"my_podcast_api/middleware"
 	"my_podcast_api/models"
 	"my_podcast_api/repository"
 	"my_podcast_api/routes"
@@ -58,9 +59,9 @@ func main() {
 	router.Handle("/createsession", &routes.CreateSessionHandler{DB: userDB, JwtTokenUtil: jwtTokenUtil, PassEncryptUtil: passEncryptUtil})
 	router.Handle("/getpodcasts", &routes.GetPodcastsHandler{UserDB: userDB, PodcastDB: podcastDB, JwtTokenUtil: jwtTokenUtil})
 	router.Handle("/getepisodes", &routes.GetEpisodesHandler{UserDB: userDB, EpisodeDB: episodeDB, JwtTokenUtil: jwtTokenUtil})
-	router.Handle("/download/{podcastid}/{podcastname}/{podcastfilename}", &routes.DownloadEpisodeHandler{JwtTokenUtil: jwtTokenUtil, EpisodeDB: episodeDB}).Methods(http.MethodGet)
+	router.Handle("/download/{podcastid}/{podcastname}/{podcastfilename}", &middleware.Authorization{JwtTokenUtil: jwtTokenUtil, Next: &routes.DownloadEpisodeHandler{EpisodeDB: episodeDB}}).Methods(http.MethodGet)
 	router.Handle("/createpodcast", &routes.CreatePodcastHandler{PodcastDB: podcastDB, JwtTokenUtil: jwtTokenUtil, FileHelper: fileHelperUtil})
-	router.Handle("/upload", &routes.UploadEpisodeHandler{UserDB: userDB, PodcastDB: podcastDB, EpisodeDB: episodeDB, JwtTokenUtil: jwtTokenUtil})
+	router.Handle("/upload", &middleware.Authorization{JwtTokenUtil: jwtTokenUtil, Next: &routes.UploadEpisodeHandler{UserDB: userDB, PodcastDB: podcastDB, EpisodeDB: episodeDB, JwtTokenUtil: jwtTokenUtil}}).Methods(http.MethodPost)
 
 	http.ListenAndServe(":8080", router)
 	//http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", nil)
