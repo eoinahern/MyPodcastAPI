@@ -37,9 +37,8 @@ type EndSessionHandler struct {
 }
 
 type CreatePodcastHandler struct {
-	PodcastDB    *repository.PodcastDB
-	JwtTokenUtil *util.JwtTokenUtil
-	FileHelper   *util.FileHelperUtil
+	PodcastDB  *repository.PodcastDB
+	FileHelper *util.FileHelperUtil
 }
 
 type GetPodcastsHandler struct {
@@ -62,10 +61,9 @@ type DownloadEpisodeHandler struct {
 
 type UploadEpisodeHandler struct {
 	//credentials. then upload to network
-	UserDB       *repository.UserDB
-	EpisodeDB    *repository.EpisodeDB
-	PodcastDB    *repository.PodcastDB
-	JwtTokenUtil *util.JwtTokenUtil
+	UserDB    *repository.UserDB
+	EpisodeDB *repository.EpisodeDB
+	PodcastDB *repository.PodcastDB
 }
 
 type DeleteEpisodeHandler struct {
@@ -186,55 +184,39 @@ func (c *CreatePodcastHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 	//3. store data in DB about podcast
 	//3. return success
 
-	if req.Method == http.MethodPost {
+	w.Header().Set("Content-Type", "application/json")
 
-		w.Header().Set("Content-Type", "application/json")
+	var podcast models.Podcast
+	err := json.NewDecoder(req.Body).Decode(&podcast)
 
-		var podcast models.Podcast
-		err := json.NewDecoder(req.Body).Decode(&podcast)
+	if err != nil {
+		http.Error(w, http.StatusText(51), http.StatusInternalServerError)
+		return
+	}
+
+	podcastname := req.URL.Query().Get("podcastname")
+
+	if len(podcastname) == 0 {
+		http.Error(w, http.StatusText(22), http.StatusBadRequest)
+		return
+	}
+
+	path := fmt.Sprintf("%s/%d/%s", podcastFiles, podcast.PodcastID, podcastname)
+
+	if !c.FileHelper.CheckDirFileExists(path) {
+		c.FileHelper.CreateDir(path)
+		podcast.Location = path
+		podcast.Name = podcastname
+		err = c.PodcastDB.CreatePodcast(podcast)
 
 		if err != nil {
 			http.Error(w, http.StatusText(51), http.StatusInternalServerError)
 			return
 		}
 
-		token := getTokenFromHeader(req)
-		code, _ := c.JwtTokenUtil.CheckTokenCredentials(token)
-
-		if code != -1 {
-			w.WriteHeader(code)
-			w.Write(tokenErr)
-			return
-		}
-
-		podcastname := req.URL.Query().Get("podcastname")
-
-		if len(podcastname) == 0 {
-			http.Error(w, http.StatusText(22), http.StatusBadRequest)
-			return
-		}
-
-		path := fmt.Sprintf("%s/%d/%s", podcastFiles, podcast.PodcastID, podcastname)
-
-		if !c.FileHelper.CheckDirFileExists(path) {
-			c.FileHelper.CreateDir(path)
-			podcast.Location = path
-			podcast.Name = podcastname
-			err = c.PodcastDB.CreatePodcast(podcast)
-
-			if err != nil {
-				http.Error(w, http.StatusText(51), http.StatusInternalServerError)
-				return
-			}
-
-			mpod, _ := json.Marshal(podcast)
-			w.Write(mpod)
-		}
-
-	} else {
-		http.Error(w, notAllowedErrStr, http.StatusMethodNotAllowed)
+		mpod, _ := json.Marshal(podcast)
+		w.Write(mpod)
 	}
-
 }
 
 // get a list of the most popular podcasts and return to the users

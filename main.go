@@ -60,8 +60,8 @@ func main() {
 	router.Handle("/getpodcasts", &routes.GetPodcastsHandler{UserDB: userDB, PodcastDB: podcastDB, JwtTokenUtil: jwtTokenUtil})
 	router.Handle("/getepisodes", &routes.GetEpisodesHandler{UserDB: userDB, EpisodeDB: episodeDB, JwtTokenUtil: jwtTokenUtil})
 	router.Handle("/download/{podcastid}/{podcastname}/{podcastfilename}", &middleware.Authorization{JwtTokenUtil: jwtTokenUtil, Next: &routes.DownloadEpisodeHandler{EpisodeDB: episodeDB}}).Methods(http.MethodGet)
-	router.Handle("/createpodcast", &routes.CreatePodcastHandler{PodcastDB: podcastDB, JwtTokenUtil: jwtTokenUtil, FileHelper: fileHelperUtil})
-	router.Handle("/upload", &middleware.Authorization{JwtTokenUtil: jwtTokenUtil, Next: &routes.UploadEpisodeHandler{UserDB: userDB, PodcastDB: podcastDB, EpisodeDB: episodeDB, JwtTokenUtil: jwtTokenUtil}}).Methods(http.MethodPost)
+	router.Handle("/createpodcast", &middleware.Authorization{JwtTokenUtil: jwtTokenUtil, Next: &routes.CreatePodcastHandler{PodcastDB: podcastDB, FileHelper: fileHelperUtil}}).Methods(http.MethodPost)
+	router.Handle("/upload", &middleware.Authorization{JwtTokenUtil: jwtTokenUtil, Next: &routes.UploadEpisodeHandler{UserDB: userDB, PodcastDB: podcastDB, EpisodeDB: episodeDB}}).Methods(http.MethodPost)
 
 	http.ListenAndServe(":8080", router)
 	//http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", nil)
