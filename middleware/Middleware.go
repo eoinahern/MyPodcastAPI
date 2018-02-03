@@ -9,11 +9,6 @@ import (
 	"strings"
 )
 
-type Authorization struct {
-	Next         http.Handler
-	JwtTokenUtil *util.JwtTokenUtil
-}
-
 type Adapter func(http.Handler) http.Handler
 
 func Adapt(finalHandler http.Handler, adapters ...Adapter) http.Handler {
@@ -46,34 +41,6 @@ func AuthMiddlewareInit(jwtTokenUtil *util.JwtTokenUtil) Adapter {
 
 		})
 	}
-}
-
-func StringMiddlewareInit(something string) Adapter {
-	return func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			fmt.Println(something)
-			h.ServeHTTP(w, req)
-		})
-	}
-}
-
-func (a *Authorization) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-
-	fmt.Println("authorization middleware!!")
-
-	token := getTokenFromHeader(req)
-	code, message := a.JwtTokenUtil.CheckTokenCredentials(token)
-
-	if code != -1 {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(code)
-		msg, _ := json.Marshal(models.Message{Message: message})
-		w.Write(msg)
-		fmt.Println("auth failed!!")
-		return
-	}
-
-	a.Next.ServeHTTP(w, req)
 }
 
 func getTokenFromHeader(req *http.Request) string {

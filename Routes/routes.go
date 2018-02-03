@@ -26,8 +26,8 @@ type RegisterHandler struct {
 
 type CreateSessionHandler struct {
 	DB              *repository.UserDB
-	JwtTokenUtil    *util.JwtTokenUtil
 	PassEncryptUtil *util.PasswordEncryptUtil
+	JwtTokenUtil    *util.JwtTokenUtil
 }
 
 type ReCreateSession struct {
@@ -42,16 +42,14 @@ type CreatePodcastHandler struct {
 }
 
 type GetPodcastsHandler struct {
-	UserDB       *repository.UserDB
-	PodcastDB    *repository.PodcastDB
-	JwtTokenUtil *util.JwtTokenUtil
+	UserDB    *repository.UserDB
+	PodcastDB *repository.PodcastDB
 }
 
 //all episodes associated with specific podcast
 type GetEpisodesHandler struct {
-	UserDB       *repository.UserDB
-	EpisodeDB    *repository.EpisodeDB
-	JwtTokenUtil *util.JwtTokenUtil
+	UserDB    *repository.UserDB
+	EpisodeDB *repository.EpisodeDB
 }
 
 //a specific episode data
@@ -137,32 +135,25 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 func (c *CreateSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
-	if req.Method == http.MethodPost {
+	decoder := json.NewDecoder(req.Body)
+	var user models.User
+	err := decoder.Decode(&user)
 
-		decoder := json.NewDecoder(req.Body)
-		var user models.User
-		err := decoder.Decode(&user)
-
-		if err != nil {
-			http.Error(w, "internal error", http.StatusInternalServerError)
-		}
-
-		dbUser := c.DB.GetUser(user.UserName)
-		w.Header().Set("Content-Type", "application/json")
-
-		if c.PassEncryptUtil.CheckSame(dbUser.Password, user.Password) {
-			user.Token = c.JwtTokenUtil.CreateToken(user.UserName)
-			jsonUser, _ := json.Marshal(user)
-			w.Write(jsonUser)
-		} else {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`{"error" : "incorrect pass"}`))
-		}
-
-	} else {
-		http.Error(w, notAllowedErrStr, http.StatusMethodNotAllowed)
+	if err != nil {
+		http.Error(w, "internal error", http.StatusInternalServerError)
 	}
 
+	dbUser := c.DB.GetUser(user.UserName)
+	w.Header().Set("Content-Type", "application/json")
+
+	if c.PassEncryptUtil.CheckSame(dbUser.Password, user.Password) {
+		user.Token = c.JwtTokenUtil.CreateToken(user.UserName)
+		jsonUser, _ := json.Marshal(user)
+		w.Write(jsonUser)
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"error" : "incorrect pass"}`))
+	}
 }
 
 func (e *EndSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -224,33 +215,17 @@ func (c *CreatePodcastHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 
 func (g *GetPodcastsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
-	if req.Method == http.MethodGet {
+	w.Header().Set("Content-Type", "application/json")
 
-		token := getTokenFromHeader(req)
-		w.Header().Set("Content-Type", "application/json")
-		code, _ := g.JwtTokenUtil.CheckTokenCredentials(token)
+	podcasts := g.PodcastDB.GetAll()
+	podcastsMarshaled, err := json.Marshal(podcasts)
 
-		if code != -1 {
-			w.WriteHeader(code)
-			w.Write(tokenErr)
-			return
-		}
-
-		podcasts := g.PodcastDB.GetAll()
-		podcastsMarshaled, err := json.Marshal(podcasts)
-
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write(internalErr)
-		} else {
-			w.Write(podcastsMarshaled)
-		}
-
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(internalErr)
 	} else {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		w.Write([]byte(`{ "error" : "not allowed"}`))
+		w.Write(podcastsMarshaled)
 	}
-
 }
 
 /**
@@ -260,31 +235,16 @@ func (g *GetPodcastsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 
 func (g *GetEpisodesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
-	if req.Method == http.MethodGet {
+	podcastid, err := strconv.Atoi(req.URL.Query().Get("podcastid"))
 
-		token := getTokenFromHeader(req)
-		status, errTxt := g.JwtTokenUtil.CheckTokenCredentials(token)
-
-		if status != -1 {
-			http.Error(w, errTxt, status)
-			return
-		}
-
-		podcastid, err := strconv.Atoi(req.URL.Query().Get("podcastid"))
-
-		if err != nil {
-			http.Error(w, http.StatusText(22), http.StatusBadRequest)
-			return
-		}
-
-		episodes := g.EpisodeDB.GetAllEpisodes(podcastid)
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(&episodes)
-
-	} else {
-		http.Error(w, notAllowedErrStr, http.StatusMethodNotAllowed)
+	if err != nil {
+		http.Error(w, http.StatusText(22), http.StatusBadRequest)
+		return
 	}
 
+	episodes := g.EpisodeDB.GetAllEpisodes(podcastid)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(&episodes)
 }
 
 func (g *DownloadEpisodeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
