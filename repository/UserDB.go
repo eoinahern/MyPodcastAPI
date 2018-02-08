@@ -6,15 +6,15 @@ import (
 	"my_podcast_api/models"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	//_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-//UserDB : used to do CRUD operations on the users DB table
+//UserDB : used to do CRUD operations on the users DB table.
 type UserDB struct {
 	*gorm.DB
 }
 
-//CheckExist : check user exists in table by users email address
+//CheckExist : check user exists in table by users email address.
 func (DB *UserDB) CheckExist(email string) bool {
 
 	var count int
@@ -27,7 +27,7 @@ func (DB *UserDB) CheckExist(email string) bool {
 	return false
 }
 
-//ValidateUserPlusRegToken : check if user with specific registration exists in table
+//ValidateUserPlusRegToken : check if user with specific registration exists in table.
 func (DB *UserDB) ValidateUserPlusRegToken(email string, regToken string) bool {
 
 	var count int
@@ -40,7 +40,7 @@ func (DB *UserDB) ValidateUserPlusRegToken(email string, regToken string) bool {
 	return false
 }
 
-//SetVerified : set user with specific token and email to be verified in table
+//SetVerified : set user with specific token and email to be verified in table.
 func (DB *UserDB) SetVerified(username string, token string) {
 
 	var user models.User
@@ -54,7 +54,7 @@ func (DB *UserDB) SetVerified(username string, token string) {
 
 }
 
-//ValidatePasswordAndUser : check user exists with specific password
+//ValidatePasswordAndUser : check user exists with specific password.
 func (DB *UserDB) ValidatePasswordAndUser(email string, password string) bool {
 
 	var user models.User
@@ -64,16 +64,17 @@ func (DB *UserDB) ValidatePasswordAndUser(email string, password string) bool {
 
 	if user.UserName == email {
 		return true
-	} else {
-		return false
 	}
+
+	return false
 }
 
-//Insert : Add new user to the users table
+//Insert : Add new user to the users table.
 func (DB *UserDB) Insert(user *models.User) {
 	DB.Save(user)
 }
 
+//GetUser returns a user based on its email.
 func (DB *UserDB) GetUser(email string) models.User {
 
 	var user models.User
