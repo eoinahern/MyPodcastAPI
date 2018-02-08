@@ -132,11 +132,11 @@ func (c *ConfirmRegistrationHandler) ServeHTTP(w http.ResponseWriter, req *http.
 	user := params.Get("user")
 	token := params.Get("token")
 
-	w.Header().Set("Content-Type", "application/html")
+	w.Header().Set("Content-Type", "text/html")
 
-	if c.DB.ValidateUserPlusRegToken(user, token) { //and regtoken
+	if c.DB.ValidateUserPlusRegToken(user, token) {
 		c.DB.SetVerified(user, token)
-		w.Write([]byte(fmt.Sprintf(`<h1>  user %s registration confirmed<h1>`, user)))
+		w.Write([]byte(fmt.Sprintf("<h1>  user %s registration confirmed<h1>", user)))
 		return
 	}
 
