@@ -114,11 +114,9 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	r.DB.Insert(&user)
 
-	//remove token from response. but include in link in email
-	user.RegToken = ""
-
 	w.Header().Set("Content-Type", "application/json")
-	resp, _ := json.Marshal(user)
+	msg := &models.Message{Message: fmt.Sprintf("registration confirmation email sent to %s", user.UserName)}
+	resp, _ := json.Marshal(msg)
 	w.Write(resp)
 }
 
