@@ -25,6 +25,7 @@ type RegisterHandler struct {
 }
 
 type ConfirmRegistrationHandler struct {
+	DB *repository.UserDB
 }
 
 type CreateSessionHandler struct {
@@ -117,6 +118,8 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	r.DB.Insert(&user)
 
+	//send automated email with email link
+
 	w.Header().Set("Content-Type", "application/json")
 	msg := &models.Message{Message: fmt.Sprintf("registration confirmation email sent to %s", user.UserName)}
 	resp, _ := json.Marshal(msg)
@@ -125,10 +128,19 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 func (c *ConfirmRegistrationHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
-	//check url params exist in DB
-	// if they do. set verified to true in db
-	//return success
+	params := req.URL.Query()
+	user := params.Get("user")
+	token := params.Get("token")
 
+	w.Header().Set("Content-Type", "application/html")
+
+	if c.DB.ValidateUserPlusRegToken(user, token) { //and regtoken
+		c.DB.SetVerified(user, token)
+		w.Write([]byte(fmt.Sprintf(`<h1>  user %s registration confirmed<h1>`, user)))
+		return
+	}
+
+	w.Write([]byte("<h1> probelm verifying user? <h1>"))
 }
 
 func (c *CreateSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {

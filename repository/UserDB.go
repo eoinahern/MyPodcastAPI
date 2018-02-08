@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"log"
 	"my_podcast_api/models"
 
 	"github.com/jinzhu/gorm"
@@ -24,10 +25,32 @@ func (DB *UserDB) CheckExist(email string) bool {
 	return false
 }
 
-func (DB *UserDB) ValidatePasswordAndUser(email string, password string) bool {
+func (DB *UserDB) ValidateUserPlusRegToken(email string, regToken string) bool {
 
-	str := fmt.Sprintf("passed in : ? , ? ", email, password)
-	fmt.Println(str)
+	var count int = 0
+	DB.Model(&models.User{}).Where("user_name = ? AND reg_token = ?", email, regToken).Count(&count)
+
+	if count == 1 {
+		return true
+	}
+
+	return false
+}
+
+func (DB *UserDB) SetVerified(username string, token string) {
+
+	var user models.User
+	DB.Where("user_name = ? AND reg_token = ?", username, token).First(&user)
+	user.Verified = true
+	db := DB.Save(&user)
+
+	if db.Error != nil {
+		log.Println(db.Error)
+	}
+
+}
+
+func (DB *UserDB) ValidatePasswordAndUser(email string, password string) bool {
 
 	var user models.User
 	DB.Where("user_name = ? AND password = ?", email, password).First(&user)
