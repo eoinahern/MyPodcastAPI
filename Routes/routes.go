@@ -140,7 +140,7 @@ func (c *ConfirmRegistrationHandler) ServeHTTP(w http.ResponseWriter, req *http.
 		return
 	}
 
-	w.Write([]byte("<h1> probelm verifying user? <h1>"))
+	w.Write([]byte("<h1> problem verifying user? <h1>"))
 }
 
 func (c *CreateSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
