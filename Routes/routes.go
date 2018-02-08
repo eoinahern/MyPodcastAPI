@@ -78,14 +78,17 @@ const podcastFiles string = "./files"
 
 func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
-	if req.Method != http.MethodPost {
-		http.Error(w, notAllowedErrStr, http.StatusMethodNotAllowed)
-		return
-	}
+	//needs updating.
+	//1 . create use once token.
+	//2. add user to DB but unverified.
+	//3. send confirmation emailValidator
+	//4. new route to handle reg verification
 
 	decoder := json.NewDecoder(req.Body)
 	var user models.User
 	err := decoder.Decode(&user)
+
+	fmt.Println(user)
 
 	if err != nil {
 		panic(err)
@@ -101,15 +104,18 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//check user is in the DB?
-
 	if r.DB.CheckExist(user.UserName) {
 		http.Error(w, http.StatusText(31), http.StatusConflict)
 		return
 	}
 
 	user.Password = r.PassEncryptUtil.Encrypt(user.Password)
-	r.DB.Create(user)
+	user.RegToken = "blahblah"
+
+	r.DB.Insert(&user)
+
+	//remove token from response. but include in link in email
+	user.RegToken = ""
 
 	w.Header().Set("Content-Type", "application/json")
 	resp, _ := json.Marshal(user)

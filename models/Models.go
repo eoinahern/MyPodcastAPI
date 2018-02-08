@@ -14,9 +14,10 @@ type Config struct {
 
 type User struct {
 	UserName string    `json:"username" gorm:"primary_key; type:VARCHAR(80)"`
-	Verified bool      `json:"verified" gorm:"type:BOOLEAN" `
+	Verified bool      `json:"verified" gorm:"type:BOOLEAN; default:false" `
 	Password string    `json:"password" gorm:"type:TEXT"`
 	Token    string    `json:"token" sql:"-" gorm:"-"`
+	RegToken string    `json:"regtoken" gorm:"type:TEXT"`
 	Podcasts []Podcast `json:"podcasts" gorm:"ForeignKey:UserEmail"`
 }
 
