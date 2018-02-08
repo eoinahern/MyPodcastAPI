@@ -1,9 +1,7 @@
 package models
 
-import (
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-)
-
+//Config : this is a type used to configure DB, and transmit Singning key.
+// Inintially read in from a file
 type Config struct {
 	Port       string `json:"port"`
 	Password   string `json:"password"`
@@ -12,6 +10,7 @@ type Config struct {
 	SigningKey string `json:"signingkey"`
 }
 
+//User : Contains a podcast creators admin details incl. email, password etc
 type User struct {
 	UserName string    `json:"username" gorm:"primary_key; type:VARCHAR(80)"`
 	Verified bool      `json:"verified" gorm:"type:BOOLEAN; default:false" `
@@ -21,14 +20,17 @@ type User struct {
 	Podcasts []Podcast `json:"podcasts" gorm:"ForeignKey:UserEmail"`
 }
 
+//UserTitle : returns username
 type UserTitle struct {
 	UserName string `json:"username"`
 }
 
+//Message : relays a message string to user in a http response
 type Message struct {
 	Message string `json:"message"`
 }
 
+//Podcast : Contains data specific to a podcast incl. name, icon etc
 type Podcast struct {
 	PodcastID  uint      `gorm:"primary_key"  json:"podcastid"`
 	UserEmail  string    `json:"useremail" gorm:"type:VARCHAR(80)"`
@@ -40,6 +42,7 @@ type Podcast struct {
 	Episodes   []Episode `json:"episodes"  gorm:"ForeignKey:PodID"`
 }
 
+//SecurePodcast : similar to podcast but sent in http response with sensitive user data
 type SecurePodcast struct {
 	PodcastID  uint      `json:"podcastid"`
 	Icon       string    `json:"icon"`
@@ -49,6 +52,7 @@ type SecurePodcast struct {
 	Episodes   []Episode `json:"episodes"`
 }
 
+//Episode : Contains info on a podcasts episode. a podcast has many episodes
 type Episode struct {
 	EpisodeID uint   `json:"episodeid" gorm:"primary_key"`
 	PodID     uint   `json:"podid"`
