@@ -24,6 +24,9 @@ type RegisterHandler struct {
 	PassEncryptUtil *util.PasswordEncryptUtil
 }
 
+type ConfirmRegistrationHandler struct {
+}
+
 type CreateSessionHandler struct {
 	DB              *repository.UserDB
 	PassEncryptUtil *util.PasswordEncryptUtil
@@ -110,7 +113,7 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	user.Password = r.PassEncryptUtil.Encrypt(user.Password)
-	user.RegToken = "blahblah"
+	user.RegToken = util.GenerateRandomToken()
 
 	r.DB.Insert(&user)
 
@@ -118,6 +121,14 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	msg := &models.Message{Message: fmt.Sprintf("registration confirmation email sent to %s", user.UserName)}
 	resp, _ := json.Marshal(msg)
 	w.Write(resp)
+}
+
+func (c *ConfirmRegistrationHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+
+	//check url params exist in DB
+	// if they do. set verified to true in db
+	//return success
+
 }
 
 func (c *CreateSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
