@@ -9,6 +9,10 @@ import (
 	"strings"
 )
 
+/* stole this middleware implementation from https://medium.com/@matryer/writing-middleware-in-golang-and-how-go-makes-it-so-much-fun-4375c1246e81
+** not sure how intuitive it is to look at but works so ill keep it for now.
+ */
+
 type Adapter func(http.Handler) http.Handler
 
 func Adapt(finalHandler http.Handler, adapters ...Adapter) http.Handler {
