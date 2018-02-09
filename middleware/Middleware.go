@@ -13,8 +13,10 @@ import (
 ** not sure how intuitive it is to look at but works so ill keep it for now.
  */
 
+//Adapter : function type adapter
 type Adapter func(http.Handler) http.Handler
 
+//Adapt : wrap middleware adapters around finally executed route code
 func Adapt(finalHandler http.Handler, adapters ...Adapter) http.Handler {
 
 	for _, item := range adapters {
@@ -24,6 +26,7 @@ func Adapt(finalHandler http.Handler, adapters ...Adapter) http.Handler {
 	return finalHandler
 }
 
+//AuthMiddlewareInit : initial middleware executed to check jwt token is valid
 func AuthMiddlewareInit(jwtTokenUtil *util.JwtTokenUtil) Adapter {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {

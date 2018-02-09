@@ -27,7 +27,7 @@ func (p *PasswordEncryptUtil) CheckSame(DBpassword string, sentPassword string) 
 
 	if err := bcrypt.CompareHashAndPassword([]byte(DBpassword), []byte(sentPassword)); err != nil {
 		return false
-	} else {
-		return true
 	}
+
+	return true
 }
