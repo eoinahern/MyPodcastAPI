@@ -5,14 +5,12 @@ import (
 	"os"
 )
 
+//FileHelperUtil : helper methods for files
 type FileHelperUtil struct {
 	file []byte
 }
 
-func createDIR() {
-
-}
-
+//CheckDirFileExists : check file or dir exists
 func (f *FileHelperUtil) CheckDirFileExists(path string) bool {
 
 	_, err := os.Stat(path)
@@ -24,14 +22,7 @@ func (f *FileHelperUtil) CheckDirFileExists(path string) bool {
 	return true
 }
 
-func (f *FileHelperUtil) CheckExtension() bool {
-	return false
-}
-
-func (f *FileHelperUtil) CheckMaxSizeAllowed() {
-
-}
-
+//CreateDir : create directory
 func (f *FileHelperUtil) CreateDir(dirpath string) {
 
 	err := os.MkdirAll(dirpath, os.FileMode(0511))

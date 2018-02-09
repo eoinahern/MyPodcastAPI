@@ -59,10 +59,10 @@ func verifyTokenTime(chimey int64) bool {
 	if chimey > time.Now().Unix() {
 		log.Println("token isnt expired")
 		return true
-	} else {
-		log.Println("token is expired")
-		return false
 	}
+
+	log.Println("token is expired")
+	return false
 }
 
 func (j *JwtTokenUtil) verifyTokenUser(tokenName string) bool {
