@@ -9,11 +9,13 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
+//JwtTokenUtil : helper methods for dealing with jwt token
 type JwtTokenUtil struct {
 	SigningKey string
 	DB         *repository.UserDB
 }
 
+//CreateToken : create a jwt token
 func (j *JwtTokenUtil) CreateToken(username string) string {
 
 	token := jwt.New(jwt.SigningMethodHS256)
@@ -31,6 +33,7 @@ func (j *JwtTokenUtil) CreateToken(username string) string {
 	return signedToken
 }
 
+//CheckTokenCredentials : check token contains email in our records. plus check its not expired
 func (j *JwtTokenUtil) CheckTokenCredentials(tokenStr string) (int, string) {
 
 	token, err := jwt.Parse(tokenStr, func(passedToken *jwt.Token) (interface{}, error) {
