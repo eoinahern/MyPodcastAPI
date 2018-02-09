@@ -3,7 +3,6 @@ package routes
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"my_podcast_api/models"
 	"my_podcast_api/repository"
@@ -17,50 +16,49 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//tregister user!!!
+//RegisterHandler : register user initially
 type RegisterHandler struct {
 	EmailValidator  *validation.EmailValidation
 	DB              *repository.UserDB
 	PassEncryptUtil *util.PasswordEncryptUtil
 }
 
+//ConfirmRegistrationHandler : confirm registration via email get request
 type ConfirmRegistrationHandler struct {
 	DB *repository.UserDB
 }
 
+//CreateSessionHandler : create a session and return jwt token
 type CreateSessionHandler struct {
 	DB              *repository.UserDB
 	PassEncryptUtil *util.PasswordEncryptUtil
 	JwtTokenUtil    *util.JwtTokenUtil
 }
 
-type ReCreateSession struct {
-}
-
-type EndSessionHandler struct {
-}
-
+//CreatePodcastHandler : allows user to create a podcast
 type CreatePodcastHandler struct {
 	PodcastDB  *repository.PodcastDB
 	FileHelper *util.FileHelperUtil
 }
 
+//GetPodcastsHandler : get all podcasts
 type GetPodcastsHandler struct {
 	UserDB    *repository.UserDB
 	PodcastDB *repository.PodcastDB
 }
 
-//all episodes associated with specific podcast
+//GetEpisodesHandler : all episodes associated with specific podcast
 type GetEpisodesHandler struct {
 	UserDB    *repository.UserDB
 	EpisodeDB *repository.EpisodeDB
 }
 
-//a specific episode data
+//DownloadEpisodeHandler : download a specific episode data
 type DownloadEpisodeHandler struct {
 	EpisodeDB *repository.EpisodeDB
 }
 
+//UploadEpisodeHandler : allows admin of a podcast to upload an episode file
 type UploadEpisodeHandler struct {
 	//credentials. then upload to network
 	UserDB    *repository.UserDB
@@ -68,6 +66,7 @@ type UploadEpisodeHandler struct {
 	PodcastDB *repository.PodcastDB
 }
 
+//DeleteEpisodeHandler : delete episode from specific podcast. Admin use
 type DeleteEpisodeHandler struct {
 	UserDB    *repository.UserDB
 	PodcastDB *repository.PodcastDB
@@ -164,16 +163,6 @@ func (c *CreateSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"error" : "incorrect pass"}`))
 	}
-}
-
-func (e *EndSessionHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	if req.Method == http.MethodGet {
-		io.WriteString(w, "session ended!!!")
-
-	} else {
-		http.Error(w, notAllowedErrStr, http.StatusMethodNotAllowed)
-	}
-
 }
 
 //create a podcast entry and folder on server.
