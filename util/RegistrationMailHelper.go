@@ -1,21 +1,21 @@
 package util
 
-import (
-	"net/smtp"
-)
+const from string = "mypodcastapi@gmail.com"
 
-const (
-	from    string = "mypodcastapi@gmail.com"
-	message string = "hello, you are now registere as a user of the app blah" // want to make this a styled email
-)
+type Mail struct {
+	SenderId string
+	ToId     string
+	Subject  string
+	Body     *[]byte
+}
 
-func SendMail(userEmail *string) {
+func (m *Mail) SendMail() {
 
- err := smtp.SendMail(addr, , from, *userEmail, message)
+	//setup
+	//send a mail
 
- if err != nil {
-	 log.Println(err)
- }
+}
 
-
+func (m *Mail) CreateMessageTemplate(file string) []byte {
+	return []byte{}
 }
