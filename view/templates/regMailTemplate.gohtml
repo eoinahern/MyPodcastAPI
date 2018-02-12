@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <meta name=”viewport” content=”width=device-width”/>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <style type="text/css">
+
+.header {
+  text-align: center;
+  font-family: sans-serif;
+
+}
+.footer {
+  text-align: center;
+  font-family: sans-serif;
+  font-weight: bold;
+}
+
+.footer a {
+  color: #FFFFFF;
+  text-decoration: none;
+  background-color: coral;
+  padding: 10px 30px 10px 30px;
+}
+.message {
+  text-align: center;
+  font-family: sans-serif;
+}
+  </style>
+  <title>Registration email</title>
+</head>
+<body>
+  <table bgcolor="#FFFFFF" width="100%" cellspacing="0" cellpadding="0">
+    <tr class="header"><td><h2>Registration</h2></td></tr>
+    </br>
+    </br>
+    <tr class="message"><td><p>hello {{.User}}</p>
+    <p>Thank you for signing up to <b>the podcast api</b> please click on the link below   to confirm your subscription. </p></td></tr>
+    </br>
+    <tr class="footer"><td><h3><a href=`http://localhost/confirm/{{.User}}/{{.Token}}` target="_blank">Confirm Registration</a></h3></td></tr>
+
+  </table>
+
+</body>
+</html>

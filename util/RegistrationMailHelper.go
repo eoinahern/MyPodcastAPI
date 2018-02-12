@@ -1,12 +1,10 @@
 package util
 
-const from string = "mypodcastapi@gmail.com"
-
 type Mail struct {
-	SenderId string
-	ToId     string
-	Subject  string
-	Body     *[]byte
+	SenderId     string
+	ToId         string
+	Subject      string
+	BodyLocation string
 }
 
 func (m *Mail) SendMail() {
@@ -16,6 +14,6 @@ func (m *Mail) SendMail() {
 
 }
 
-func (m *Mail) CreateMessageTemplate(file string) []byte {
-	return []byte{}
+func (m *Mail) BuildMail() string {
+	return ""
 }
