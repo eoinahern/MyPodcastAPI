@@ -46,6 +46,7 @@ func main() {
 	episodeDB := &repository.EpisodeDB{db}
 	podcastDB := &repository.PodcastDB{db}
 	jwtTokenUtil := &util.JwtTokenUtil{SigningKey: config.SigningKey, DB: userDB}
+	regMailHelper := &util.MailRequest{SenderId: "mypodcastapi@gmail.com", BodyLocation: "view/templates/regMailTemplate.gohtml"}
 
 	db.AutoMigrate(&models.User{}, &models.Podcast{}, &models.Episode{})
 	db.Model(&models.Podcast{}).AddForeignKey("user_email", "users(user_name)", "CASCADE", "CASCADE")
@@ -55,7 +56,7 @@ func main() {
 
 	router := mux.NewRouter()
 
-	router.Handle("/register", &routes.RegisterHandler{EmailValidator: emailValidator, DB: userDB, PassEncryptUtil: passEncryptUtil}).Methods(http.MethodPost)
+	router.Handle("/register", &routes.RegisterHandler{EmailValidator: emailValidator, MailHelper: regMailHelper, DB: userDB, PassEncryptUtil: passEncryptUtil}).Methods(http.MethodPost)
 	router.Handle("/regconfirm", &routes.ConfirmRegistrationHandler{DB: userDB}).Methods(http.MethodGet)
 	router.Handle("/createsession", &routes.CreateSessionHandler{DB: userDB, JwtTokenUtil: jwtTokenUtil, PassEncryptUtil: passEncryptUtil}).Methods(http.MethodPost)
 	router.Handle("/getpodcasts", middleware.Adapt(&routes.GetPodcastsHandler{UserDB: userDB, PodcastDB: podcastDB}, middleware.AuthMiddlewareInit(jwtTokenUtil))).Methods(http.MethodGet)

@@ -13,17 +13,18 @@ const (
 	subject string = "Subject: Registration\n"
 )
 
+//MailRequest : send a mail to a specific email using html template.
 type MailRequest struct {
 	SenderId     string
 	ToId         string
 	BodyLocation string
-	BodyParams   models.TemplateParams
+	BodyParams   *models.TemplateParams
 }
 
 //SendMail : send a mail via smtp server using plainauth
 func (m *MailRequest) SendMail() (bool, error) {
 
-	smtpConf := models.SmtpConfig{}
+	smtpConf := &models.SmtpConfig{}
 	smtpConf.ReadFromFile("../smtpConfig.json")
 	auth := smtp.PlainAuth("", smtpConf.Username, smtpConf.Password, smtpConf.Server)
 	err := smtp.SendMail(smtpConf.Server+":"+string(smtpConf.Port), auth, m.SenderId, []string{m.ToId}, []byte(m.buildMail()))

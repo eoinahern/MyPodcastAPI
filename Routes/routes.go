@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"my_podcast_api/models"
 	"my_podcast_api/repository"
 	"my_podcast_api/util"
@@ -20,6 +21,7 @@ import (
 type RegisterHandler struct {
 	EmailValidator  *validation.EmailValidation
 	DB              *repository.UserDB
+	MailHelper      *util.MailRequest
 	PassEncryptUtil *util.PasswordEncryptUtil
 }
 
@@ -118,6 +120,16 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	r.DB.Insert(&user)
 
 	//send automated email with email link
+	r.MailHelper.BodyParams = &models.TemplateParams{User: user.UserName, Token: user.RegToken}
+	r.MailHelper.ToId = user.UserName
+
+	_, err = r.MailHelper.SendMail()
+
+	if err != nil {
+		log.Println("error sending automated mail")
+		http.Error(w, http.StatusText(51), http.StatusInternalServerError)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	msg := &models.Message{Message: fmt.Sprintf("registration confirmation email sent to %s", user.UserName)}
