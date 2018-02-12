@@ -37,7 +37,7 @@
     <tr class="message"><td style="padding:20px;"><p>hello {{.User}}</p>
     <p>Thank you for signing up to <b>The Podcast API</b> please click on the link below to confirm your subscription. </p></td></tr>
     </br>
-    <tr class="footer"><td><h3><a href=`http://localhost/confirm/{{.User}}/{{.Token}}` target="_blank">Confirm Registration</a></h3></td></tr>
+    <tr class="footer"><td><h3><a href="http://localhost/regconfirm?user={{.User}&token={{.Token}}" target="_blank">Confirm Registration</a></h3></td></tr>
 
   </table>
 
