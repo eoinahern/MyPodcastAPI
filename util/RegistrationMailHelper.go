@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	mime    string = "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
-	subject string = "Subject: Registration\n"
+	mime string = "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+	//subject string = "Subject: Registration\n"
 )
 
 //MailRequest : send a mail to a specific email using html template.
@@ -42,7 +42,7 @@ func (m *MailRequest) SendMail() (bool, error) {
 
 //internal helper method. just build the mail string
 func (m *MailRequest) buildMail() string {
-	return mime + subject + m.constructTemplate()
+	return mime + m.constructTemplate()
 }
 
 //helper. create the template from bodyloaction and bodyParams
