@@ -43,6 +43,11 @@ func (s *SmtpConfig) ReadFromFile(location string) {
 
 }
 
+type TemplateParams struct {
+	User  string
+	Token string
+}
+
 //User : Contains a podcast creators admin details incl. email, password etc
 type User struct {
 	UserName string    `json:"username" gorm:"primary_key; type:VARCHAR(80)"`
