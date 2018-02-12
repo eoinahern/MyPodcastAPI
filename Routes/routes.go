@@ -127,6 +127,7 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	if err != nil {
 		log.Println("error sending automated mail")
+		log.Println(err)
 		http.Error(w, http.StatusText(51), http.StatusInternalServerError)
 		return
 	}

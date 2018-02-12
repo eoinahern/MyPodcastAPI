@@ -2,6 +2,7 @@ package util
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"log"
 	"my_podcast_api/models"
@@ -25,9 +26,12 @@ type MailRequest struct {
 func (m *MailRequest) SendMail() (bool, error) {
 
 	smtpConf := &models.SmtpConfig{}
-	smtpConf.ReadFromFile("../smtpConfig.json")
+	smtpConf.ReadFromFile("smtpConfig.json")
+	fmt.Println(*smtpConf)
+	fmt.Println(*m)
+	fmt.Println(smtpConf.Server + ":" + smtpConf.Port)
 	auth := smtp.PlainAuth("", smtpConf.Username, smtpConf.Password, smtpConf.Server)
-	err := smtp.SendMail(smtpConf.Server+":"+string(smtpConf.Port), auth, m.SenderId, []string{m.ToId}, []byte(m.buildMail()))
+	err := smtp.SendMail(smtpConf.Server+":"+smtpConf.Port, auth, m.SenderId, []string{m.ToId}, []byte(m.buildMail()))
 
 	if err != nil {
 		return false, err

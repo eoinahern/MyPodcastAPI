@@ -21,7 +21,7 @@ type SmtpConfig struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Server   string `json:"server"`
-	Port     int    `json:"port"`
+	Port     string `json:"port"`
 }
 
 func (s *SmtpConfig) ReadFromFile(location string) {
