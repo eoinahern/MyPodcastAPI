@@ -1,5 +1,12 @@
 package models
 
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"os"
+)
+
 //Config : this is a type used to configure DB, and transmit Singning key.
 // Inintially read in from a file
 type Config struct {
@@ -8,6 +15,32 @@ type Config struct {
 	User       string `json:"user"`
 	Schema     string `json:"schema"`
 	SigningKey string `json:"signingkey"`
+}
+
+type SmtpConfig struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Server   string `json:"server"`
+	Port     int    `json:"port"`
+}
+
+func (s *SmtpConfig) ReadFromFile(location string) {
+
+	file, err := os.Open(location)
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	err = json.NewDecoder(file).Decode(&s)
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	fmt.Println(s.Server)
+	fmt.Println(s.Username)
+
 }
 
 //User : Contains a podcast creators admin details incl. email, password etc

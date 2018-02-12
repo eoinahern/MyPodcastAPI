@@ -1,6 +1,7 @@
 package util
 
 import (
+	"my_podcast_api/models"
 	"net/smtp"
 )
 
@@ -16,7 +17,10 @@ type Mail struct {
 
 func (m *Mail) SendMail() {
 
-	auth := smtp.PlainAuth("", username, "hellothere123", host)
+	//create auth
+	smtpConf := models.SmtpConfig{}
+	smtpConf.ReadFromFile("../smtpConfig.json")
+	auth := smtp.PlainAuth("", smtpConf.Username, smtpConf.Password, smtpConf.Server)
 
 }
 
