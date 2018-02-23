@@ -9,7 +9,6 @@ import (
 	"my_podcast_api/repository"
 	"my_podcast_api/routes"
 	"my_podcast_api/util"
-	"my_podcast_api/validation"
 	"net/http"
 	"os"
 
@@ -40,13 +39,13 @@ func main() {
 
 	//create dependencies
 	passEncryptUtil := &util.PasswordEncryptUtil{}
-	emailValidator := &validation.EmailValidation{}
+	//emailValidator := &validation.EmailValidation{}
 	fileHelperUtil := &util.FileHelperUtil{}
 	userDB := &repository.UserDB{db}
 	episodeDB := &repository.EpisodeDB{db}
 	podcastDB := &repository.PodcastDB{db}
 	jwtTokenUtil := &util.JwtTokenUtil{SigningKey: config.SigningKey, DB: userDB}
-	regMailHelper := &util.MailRequest{SenderId: "mypodcastapi@gmail.com", BodyLocation: "view/templates/regMailTemplate.html"}
+	//regMailHelper := &util.MailRequest{SenderId: "mypodcastapi@gmail.com", BodyLocation: "view/templates/regMailTemplate.html"}
 
 	db.AutoMigrate(&models.User{}, &models.Podcast{}, &models.Episode{})
 	db.Model(&models.Podcast{}).AddForeignKey("user_email", "users(user_name)", "CASCADE", "CASCADE")
@@ -56,8 +55,8 @@ func main() {
 
 	router := mux.NewRouter()
 
-	router.Handle("/register", &routes.RegisterHandler{EmailValidator: emailValidator, MailHelper: regMailHelper, DB: userDB, PassEncryptUtil: passEncryptUtil}).Methods(http.MethodPost)
-	router.Handle("/register", &routes.ConfirmRegistrationHandler{DB: userDB}).Methods(http.MethodGet)
+	//router.Handle("/register", &routes.RegisterHandler{EmailValidator: emailValidator, MailHelper: regMailHelper, DB: userDB, PassEncryptUtil: passEncryptUtil}).Methods(http.MethodPost)
+	router.Handle("/register", &routes.ConfirmRegistrationHandler{DB: userDB}).Methods(http.MethodPost)
 	router.Handle("/createsession", &routes.CreateSessionHandler{DB: userDB, JwtTokenUtil: jwtTokenUtil, PassEncryptUtil: passEncryptUtil}).Methods(http.MethodPost)
 	router.Handle("/podcasts", middleware.Adapt(&routes.GetPodcastsHandler{UserDB: userDB, PodcastDB: podcastDB}, middleware.AuthMiddlewareInit(jwtTokenUtil))).Methods(http.MethodGet)
 	router.Handle("/episodes", middleware.Adapt(&routes.GetEpisodesHandler{UserDB: userDB, EpisodeDB: episodeDB}, middleware.AuthMiddlewareInit(jwtTokenUtil))).Methods(http.MethodGet)

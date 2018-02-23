@@ -89,6 +89,10 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	//3. send confirmation emailValidator
 	//4. new route to handle reg verification
 
+	//params := req.URL.Query()
+
+	//operation := params.Get("operation")
+
 	decoder := json.NewDecoder(req.Body)
 	var user models.User
 	err := decoder.Decode(&user)
@@ -147,15 +151,14 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 func (c *ConfirmRegistrationHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
-	params := req.URL.Query()
-	user := params.Get("user")
-	token := params.Get("token")
+	var params models.TemplateParams
+	json.NewDecoder(req.Body).Decode(&params)
 
 	w.Header().Set("Content-Type", "text/html")
 
-	if c.DB.ValidateUserPlusRegToken(user, token) {
-		c.DB.SetVerified(user, token)
-		w.Write([]byte(fmt.Sprintf("<h1>  user %s registration confirmed<h1>", user)))
+	if c.DB.ValidateUserPlusRegToken(params.User, params.Token) {
+		c.DB.SetVerified(params.User, params.Token)
+		w.Write([]byte(fmt.Sprintf("<h1>  user %s registration confirmed<h1>", params.User)))
 		return
 	}
 

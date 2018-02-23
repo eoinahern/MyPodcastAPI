@@ -44,8 +44,8 @@ func (s *SmtpConfig) ReadFromFile(location string) {
 }
 
 type TemplateParams struct {
-	User  string
-	Token string
+	User  string `json:"user"`
+	Token string `json:"token"`
 }
 
 //User : Contains a podcast creators admin details incl. email, password etc
