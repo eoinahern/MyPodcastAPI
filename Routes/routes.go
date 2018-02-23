@@ -138,6 +138,13 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	w.Write(resp)
 }
 
+/**
+* TODO: this needs to change from get request. need to pass required params in body
+* could use put, patch? OR im opting for POST with body and a url param operation=confirm
+* to me this seems like its legal a GET should be resource locator and shouldnt be
+* passing data in GET url according to API rules.
+**/
+
 func (c *ConfirmRegistrationHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	params := req.URL.Query()
