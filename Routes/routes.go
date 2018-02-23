@@ -90,7 +90,6 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	//4. new route to handle reg verification
 
 	//params := req.URL.Query()
-
 	//operation := params.Get("operation")
 
 	decoder := json.NewDecoder(req.Body)
