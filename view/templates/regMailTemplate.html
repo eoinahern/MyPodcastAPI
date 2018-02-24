@@ -34,14 +34,16 @@
     <tr class="message"><td style="padding:20px;"><p>hello {{.User}}</p>
     <p>Thank you for signing up to <b>The Podcast API</b> please click on the link below to confirm your subscription. </p></td></tr>
     </br>
-    <!--<tr class="footer"><td><h3><a href="http://localhost:8080/regconfirm?user={{.User}}&token={{.Token}}" target="_blank">Confirm Registration</a></h3></td></tr>-->
-    <tr class="footer">
-    <form enctype="application/json" action="http://localhost:8080/registercon" method="post">
-       <input name='user' value={{.User}} type="hidden">
+    <tr class="footer"><td><h3><a href="http://localhost:8080/confirm?user={{.User}}&token={{.Token}}" target="_blank">Confirm Registration</a></h3></td></tr>
+  <!--  <tr class="footer">
+    <td>
+    <form enctype="application/json" action="http://localhost:8080/registercon" method="post" target="_blank">
+       <input name="user" value={{.User}} type="hidden" >
        <input name="token" value={{.Token}} type="hidden">
-       <input type="submit" value="Confirm Registration">
+       <input type="submit" value="Confirm Registration" >
     </form>
-    <tr>
+  </td>
+</tr>-->
 
   </table>
 </body>

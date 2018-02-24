@@ -150,14 +150,19 @@ func (r *RegisterHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 func (c *ConfirmRegistrationHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
-	var params models.TemplateParams
-	json.NewDecoder(req.Body).Decode(&params)
+	params := req.URL.Query()
+	user := params.Get("user")
+	token := params.Get("token")
 
 	w.Header().Set("Content-Type", "text/html")
 
-	if c.DB.ValidateUserPlusRegToken(params.User, params.Token) {
-		c.DB.SetVerified(params.User, params.Token)
-		w.Write([]byte(fmt.Sprintf("<h1>  user %s registration confirmed<h1>", params.User)))
+	fmt.Println(params)
+	fmt.Println(user)
+	fmt.Println(token)
+
+	if c.DB.ValidateUserPlusRegToken(user, token) {
+		c.DB.SetVerified(user, token)
+		w.Write([]byte(fmt.Sprintf("<h1>  user %s registration confirmed<h1>", user)))
 		return
 	}
 
